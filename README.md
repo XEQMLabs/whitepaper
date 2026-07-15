@@ -1,6 +1,6 @@
 # XEQM Labs
 ## Tokenomics Whitepaper
-### Draft v8 | 05/14/2026
+### Draft v9 | 07/15/2026
 
 ---
 
@@ -48,6 +48,8 @@ The supply curve a developer, exchange, or operator evaluates today, the verifie
 ### Block Emissions
 
 The network produces a new block every 60 seconds and awards 8.25 XEQM to the selected service node. This generates 11,880 XEQM per day across the network.
+
+Starting with HF21, service node block rewards are distributed on a weekly batching schedule rather than per-block. Rewards accumulate over each 10,080-block window (approximately 7 days) and are paid out to operators at the end of each window. The total emission rate is unchanged; only the payment cadence shifts from per-block to weekly.
 
 ### Governance Emission
 
@@ -97,7 +99,8 @@ The following parameters apply to service nodes on the XEQM Labs network.
 | Full node requirement | 200,000 XEQM |
 | Minimum operator stake | 100,000 XEQM (50% of full requirement) |
 | Maximum operator fee | 10% |
-| Unbonding period | 14 days |
+| Unbonding period (voluntary withdrawal) | 14 days, rewards continue during period |
+| Unbonding period (forced deregistration) | 10,080 blocks (~7 days), no rewards during period |
 | Maximum contributor slots | 11 (including the operator) |
 | Minimum community contribution per slot | 10,000 XEQM |
 | Community staker window per node | Up to 100,000 XEQM across up to 10 contributor slots |
@@ -121,8 +124,8 @@ The minimum operator stake is set at 50% of the full node requirement, or 100,00
 Service nodes on the XEQM Labs network operate on continuous terms rather than fixed periods.
 
 - Nodes remain active indefinitely as long as the operator maintains staked collateral and meets performance requirements. There are no fixed terms and no renewals required.
-- If a node falls out of compliance, the operator can correct the issue and resume earning without losing the remainder of a fixed period. If the operator does not remediate the issue, the service node unbonds after 7 days and does not receive rewards during that unbonding period.
-- Operators can exit at any time. The 14-day unbonding period applies only when the operator chooses to leave.
+- If a node falls out of compliance, the operator can correct the issue and resume earning without losing the remainder of a fixed period. If the operator does not remediate the issue, the service node is deregistered and enters a forced unbonding period of 10,080 blocks (approximately 7 days). No rewards are paid during a forced unbonding period.
+- Operators can exit at any time through a voluntary withdrawal. The voluntary unbonding period is 14 days. Unlike forced deregistration, rewards continue to accrue during a voluntary unbonding period.
 - Community contributors can supply between 10,000 XEQM and the remaining unfunded portion of the node requirement, across up to 10 available contributor slots.
 
 ---
@@ -153,6 +156,8 @@ Wallet splitting does not necessarily indicate malicious intent. Large holders c
 
 The following protections are in place or are enforced through governance policy.
 
+The full technical specification for these anti-sybil measures, including the public key blocklist schema and the contributor slot graph analysis methodology, is published at [XEQMLabs/xeqm-sybil-resistance](https://github.com/XEQMLabs/xeqm-sybil-resistance).
+
 **Capital cost barrier.** The 100,000 XEQM minimum operator stake substantially raises the cost of running each node and meaningfully limits how many nodes any single wallet can operate.
 
 **Governance node concentration cap.** A governance-enforced policy caps identifiable operators at approximately 50 nodes, roughly 7% of a 700-node network. The node explorer publicly lists every active service node along with its registration public key and announced IP address. The team and community monitor that list for patterns indicating a single operator controls more than the cap. When we identify a pattern, we contact the operator and give them the opportunity to voluntarily reduce their node count. Operators who do not comply face public identification and governance action, which at minimum means we add their registration keys to a protocol blocklist that prevents future node registration.
@@ -163,9 +168,9 @@ The following protections are in place or are enforced through governance policy
 
 **Contributor slot graph analysis.** Each service node supports up to 11 contributor slots, and each contributor registers a wallet address against the node. An operator who runs multiple nodes and uses the same secondary contributor addresses across those nodes, or who funds contributor slots from wallets with observable relationships to the operator wallet, creates a graph that monitoring tools can analyze. On a privacy-preserving chain this analysis is less straightforward than on a transparent chain, but the contributor registrations carry observable data that supplements IP and key monitoring.
 
-**Nakamoto coefficient target.** The network targets a Nakamoto coefficient of at least 8, meaning at least 8 independent operators should need to cooperate to control 51% of active nodes. The current wallet distribution produces a Nakamoto coefficient of approximately 4 at launch. The governance node cap and natural growth of the operator set are the primary mechanisms that will improve that number over time.
+**Nakamoto coefficient target.** The network targets a Nakamoto coefficient of at least 8, meaning at least 8 independent operators should need to cooperate to control 51% of active nodes. As of July 2026, with 761 active nodes across 184 independent operators, the network Nakamoto coefficient is 7. Continued enforcement of the governance node cap and ongoing growth of the operator set are the primary mechanisms for maintaining and improving that number over time.
 
-The Nakamoto coefficient of approximately 4 at launch is lower than the target of 8. We state that here because honest disclosure of a known weakness is more valuable than silence. The gap closes as more operators join the network and as the governance concentration cap is enforced. Oracle quorum selection, described in Section 10, will not be opened to external contract consumers until the Nakamoto coefficient reaches at least 6, providing a meaningful integrity floor before oracle outputs carry real trust weight.
+The Nakamoto coefficient of 7 is approaching the long-term target of 8. We state that here because honest disclosure of a known weakness is more valuable than silence. The gap closes as more operators join the network and as the governance concentration cap is enforced. Oracle quorum selection, described in Section 10, will not be opened to external contract consumers until the Nakamoto coefficient reaches at least 6. That threshold has been reached. External oracle access in Phase 4 is now gated on completing the Phase 3 mainnet oracle rollout rather than on the Nakamoto coefficient floor.
 
 ---
 
@@ -217,12 +222,13 @@ The 40/25/15/10/5/5 allocation described in Section 3 guides planning as a targe
 | Maximum contributor slots | 11 (including operator) |
 | Minimum community contribution | 10,000 XEQM per slot |
 | Community staker window per node | Up to 100,000 XEQM across 10 slots |
-| Unbonding period | 14 days |
+| Unbonding period (voluntary withdrawal) | 14 days, rewards continue during period |
+| Unbonding period (forced deregistration) | 10,080 blocks (~7 days), no rewards during period |
 | Total supply | Verified starting supply: 276,917,604 XEQM. Grows over time through scheduled emissions. |
 | Supply locked at 700 nodes | 140,000,000 XEQM (approximately 50.6% of starting supply, declining as a share over time) |
 | Freely circulating at 700 nodes | Approximately 137,000,000 XEQM at starting supply, growing with emissions |
-| Solo operator APY at 700 nodes | ~3.1% (block rewards only) |
-| Nakamoto coefficient at launch | ~4 (target: 8, improving over time) |
+| Solo operator APY at 700 nodes | ~3.1% (block rewards only, paid weekly via HF21 batching) |
+| Nakamoto coefficient (July 2026) | 7 (target: 8; 761 nodes, 184 operators) |
 | Oracle quorum external activation | Nakamoto coefficient ≥ 6 |
 
 ---
@@ -231,9 +237,9 @@ The 40/25/15/10/5/5 allocation described in Section 3 guides planning as a targe
 
 The XEQM Labs mainnet is live. The roadmap that follows describes the work ahead.
 
-**Phase 1: Network stabilization.** Continued monitoring of block production, service node uptime, and network health. Operator onboarding support. Node explorer feature completion.
+**Phase 1: Network stabilization.** COMPLETE. Block production is stable, the operator fleet has grown to 761 active nodes across 184 independent operators, and the network Nakamoto coefficient has reached 7. Ongoing monitoring of block production, service node uptime, and network health continues. Hardware upgrades across the operator fleet are underway to meet increasing network demands and maintain high service-level requirements as the platform scales toward Phase 2 and oracle workloads.
 
-**Phase 2: XEQM Labs API platform production launch.** Public release of the developer API, tier registration, API node onboarding, and the first production integrations. API node fee distribution becomes active.
+**Phase 2: XEQM Labs API platform production launch.** ACTIVE. Public release of the developer API, tier registration, API node onboarding, and the first production integrations. API node fee distribution becomes active.
 
 **Phase 3: Privacy Oracle phased rollout.** Internal proof of concept, federated testnet, and mainnet oracle with internal consumers, as described in Section 10.
 
