@@ -148,6 +148,8 @@ Second, the 50% minimum operator stake requires the operator to commit substanti
 
 Community stakers should still exercise judgment when choosing a node. The node explorer displays the fee, the operator's stake percentage, and the current contributor count before any staker makes a commitment.
 
+These two controls — the fee cap and the minimum operator stake — address reward capture specifically. They do not prevent network concentration. An operator with sufficient capital can register many nodes while meeting the minimum stake requirement on each one, either by fully self-funding each node at 200,000 XEQM or by attracting community contributors to supply the remaining 100,000 XEQM per node. In both cases the operator retains full control of every node they register, and that control is what determines network influence. Community stakers who contribute to a node should understand that their stake increases that operator's network presence regardless of the fee terms. Network concentration is a separate attack surface with its own dedicated controls, described in the next section.
+
 ### Anti-Sybil Measures
 
 In this context, a Sybil attack means a single actor operating a large number of nodes to gain disproportionate influence over the network. The concern is real. The swap ledger shows that the top 10 wallets in the migration hold a substantial concentration of XEQM, and several wallets appear to have been deliberately split into near-identical balances.
@@ -158,7 +160,7 @@ The following protections are in place or are enforced through governance policy
 
 The full technical specification for these anti-sybil measures, including the public key blocklist schema and the contributor slot graph analysis methodology, is published at [XEQMLabs/xeqm-sybil-resistance](https://github.com/XEQMLabs/xeqm-sybil-resistance).
 
-**Capital cost barrier.** The 100,000 XEQM minimum operator stake substantially raises the cost of running each node and meaningfully limits how many nodes any single wallet can operate.
+**Capital cost barrier.** The 100,000 XEQM minimum operator stake ensures that every operator commits real capital to each node they register. An operator running N nodes at the minimum stake must hold at least N × 100,000 XEQM in staked collateral. This raises the cost of accumulation but does not cap it — a well-capitalized operator can still self-fund many nodes above the minimum, and an operator who attracts community contributors to fill the remaining stake per node can accumulate nodes at half the self-funding cost while retaining full operational control of each one. The minimum stake is therefore the primary control against the reward capture attack, not against concentration. The governance node concentration cap below is the binding constraint on how many nodes any one operator may control.
 
 **Governance node concentration cap.** A governance-enforced policy caps identifiable operators at approximately 50 nodes, roughly 7% of a 700-node network. The node explorer publicly lists every active service node along with its registration public key and announced IP address. The team and community monitor that list for patterns indicating a single operator controls more than the cap. When we identify a pattern, we contact the operator and give them the opportunity to voluntarily reduce their node count. Operators who do not comply face public identification and governance action, which at minimum means we add their registration keys to a protocol blocklist that prevents future node registration.
 
