@@ -164,6 +164,12 @@ The full technical specification for these anti-sybil measures, including the pu
 
 **Governance node concentration cap.** A governance-enforced policy caps identifiable operators at approximately 50 nodes, roughly 7% of a 700-node network. The node explorer publicly lists every active service node along with its registration public key and announced IP address. The team and community monitor that list for patterns indicating a single operator controls more than the cap. When we identify a pattern, we contact the operator and give them the opportunity to voluntarily reduce their node count. Operators who do not comply face public identification and governance action, which at minimum means we add their registration keys to a protocol blocklist that prevents future node registration.
 
+This cap is a governance norm, not a protocol guarantee. A sophisticated operator using multiple wallets, different IP addresses, and diverse hosting providers is difficult to identify with certainty at the protocol level. We are honest about this limitation.
+
+**Per-wallet registration cap (planned).** A forthcoming protocol change will enforce a hard registration limit per operator address. Attempts to register a new node from an address that already controls more than the cap will be rejected by the network. This creates friction and an observable signal — multiple wallets each sitting at exactly the cap is a detectable pattern — but is not a hard barrier against a motivated actor willing to use many wallets. It is a deterrent, not a guarantee.
+
+**Quorum deduplication (planned, requires hard fork).** The strongest protocol-level control planned for the network. The quorum selection logic will be modified to allow at most one node per operator address to hold a validator seat in any given Pulse round, oracle session, or obligations quorum. If a random draw selects two nodes from the same operator, one is replaced by a node from a different operator. This limits the consensus influence any single operator can exercise per round regardless of how many nodes they run or how many wallets they use. It cannot be bypassed without significant coordination overhead, and even then influence is bounded by quorum size. This change does not affect block rewards, which continue to scale with node count. Activation requires a hard fork, testnet validation, and community coordination. Parameters are under active discussion with the operator community.
+
 **Public key blocklisting.** A governance-managed blocklist of registration public keys is maintained, and the network refuses those keys for future node registration. When a bad actor is deregistered for misbehavior, their public key is permanently added to that list. Generating a new key pair costs nothing, but operating under a new key while the original sits on the blocklist is visible to monitoring tools and creates a documented record of evasion that strengthens the case for further governance action.
 
 **IP address monitoring.** Service nodes must publicly announce their IP address to participate in the network. This is a functional requirement, not optional. Multiple nodes running from the same IP address or subnet almost certainly belong to the same operator. Multiple nodes running from the same hosting provider and datacenter block strongly suggest a single operator even across different IP addresses. We flag nodes that appear from related IP ranges shortly after a deregistration event for review. A sophisticated operator who uses different VPS providers across regions adds cost and complexity to their operation without eliminating their visibility, because the pattern of behavior across keys, addresses, and timing still produces a traceable record.
@@ -247,7 +253,9 @@ The XEQM Labs mainnet is live. The roadmap that follows describes the work ahead
 
 **Phase 4: External oracle consumer access.** Oracle outputs become available to external smart contract consumers and Production and Enterprise tier XEQM Labs developers. This phase activates only after the Nakamoto coefficient reaches at least 6.
 
-**Phase 5: Formal governance.** Structured proposal process, weighted voting for operators, and the long-term transition away from founding-team governance.
+**Phase 5: Quorum deduplication hard fork.** Protocol-level enforcement of per-operator quorum seat limits. Activation after testnet validation and operator community coordination. Eliminates the ability of any single operator to hold multiple validator seats in the same consensus round, regardless of wallet structure.
+
+**Phase 6: Formal governance.** Structured proposal process, weighted voting for operators, and the long-term transition away from founding-team governance.
 
 ---
 
