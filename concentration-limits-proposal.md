@@ -1,59 +1,96 @@
-# Node Concentration Limits — Options and Proposal
+# Node Concentration Limits - Proposal and Implementation Status
 
-As the network has grown to 762 active nodes across 185 operators, two operators now exceed our current voluntary governance cap of ~50 nodes. This has been a topic of discussion in the Telegram Node Operators channel. This is a good time to have a conversation with the full operator community about how we want to handle concentration limits as we advance, because the right answer involves a protocol change and I want operator input before I build it.
+As the network has grown to 693 active nodes across 184 operators, concentration of service nodes among a small number of operators has been an ongoing topic of discussion in the Telegram Node Operators channel. This document describes the problem, the options considered, the approach we have chosen, and the current implementation status of each layer.
 
-The network's Nakamoto coefficient — the number of independent operators who would need to cooperate to control 51% of active nodes — is currently 7, an improvement from 4 when I originally wrote the white paper. Our target is 8. A single operator controlling 14% of nodes is a meaningful concentration of consensus influence, independent of whether their intentions are good. The protocol should not require trusting any single operator.
+The network's Nakamoto coefficient - the number of independent operators who would need to cooperate to control 51% of active nodes - is currently 7, up from 4 at initial mainnet launch. Our target is 8. A single operator controlling 10% or more of active nodes is a meaningful concentration of consensus influence, independent of whether their intentions are good. The protocol should not require trusting any single operator.
 
-A node cap cannot be perfectly enforced in code on a pseudonymous chain. An operator using multiple wallets, different IP addresses, and multiple hosting providers is essentially undetectable at the protocol level. Any comments stating otherwise are not being honest with you. To address this, I see three options:
-
----
-
-## 1) Keep the voluntary cap as-is
-
-The current governance cap of ~50 nodes per operator is enforced through public monitoring, community pressure, and a governance blocklist. When I identify a violation, assuming I know who the operator is, I contact them, and operators who do not comply face public identification and blocklisting of their registration keys.
-
-**Advantage:** No hard fork or code changes are required.
-
-**Disadvantage:** A bad actor who deliberately obscures their identity across multiple wallets faces no protocol-level resistance. The cap is only as strong as my ability to identify operators, which is a heuristic process. It is also only as strong as my willingness to enforce it.
+A node cap cannot be perfectly enforced in code on a pseudonymous network. An operator using multiple wallets, different IP addresses, and multiple hosting providers is difficult to detect at the protocol level. Any claim otherwise is not being honest with you. This is why the approach described here is layered: no single control is sufficient on its own, but together they raise the cost and complexity of evasion to the point where it becomes impractical for most actors and detectable for determined ones.
 
 ---
 
-## 2) Per-wallet registration cap enforced in the protocol
+## The Problem
 
-The registration code is changed to reject any new node registration from an operator address that already controls N or more active nodes. The network itself enforces the limit; no governance action or manual monitoring is needed to stop a single-wallet operator from exceeding it.
+On a privacy chain, the tools available for identifying operator concentration differ from those on a transparent public blockchain. Transaction-level graph analysis is unavailable by design - that is the privacy guarantee the chain provides to users. Service node operators, however, operate under different conditions. Participation in the service node network requires public announcement of an IP address, a public registration key, and observable contributor wallet relationships at the node registration level.
 
-This eliminates the need to monitor and intervene in the common case: an honest large operator using a single wallet is automatically stopped at the cap. It also means that even if a bad actor splits across multiple wallets, each wallet is still bounded, which reduces the maximum influence any single wallet can accumulate before it becomes detectable.
+These signals - IP address, subnet, registration key patterns, contributor wallet relationships, and behavioral timing across registrations - give the network a practical basis for identifying concentration without relying on transaction-level data. Operators are pseudonymous participants, not anonymous ones. An operator running many nodes from shared infrastructure has a visible footprint.
 
-It does not stop a motivated actor willing to use multiple wallets. A second wallet with a fresh operator address faces the same cap from zero, with no connection to the first in the protocol's view. The cap is therefore a ceiling on single-wallet accumulation, not a ceiling on total operator accumulation.
-
-Hitting the cap exactly is not evidence of wallet splitting; honest operators respecting the limit will also hit it. The useful detection signal is two separate operator addresses sharing the same IP address or subnet. Nodes must publicly announce their IP to participate in the network, so shared infrastructure across wallets is an operational fact rather than a coincidence. IP correlation combined with the per-wallet cap gives investigators a concrete, specific basis for follow-up rather than a guess.
-
-**Advantage:** Automatically enforces the cap against single-wallet operators without governance involvement. Bounds per-wallet accumulation even for actors who split, limiting the damage any one wallet can do before it surfaces in monitoring.
-
-**Disadvantage:** Does not protect against a determined actor willing to manage multiple wallets and use distinct infrastructure for each. Offers a false sense of security if treated as a complete solution. The cap number also requires careful calibration; set it too low and professional operators running legitimate large infrastructure hit it before any bad actor does; set it too high and it rarely triggers.
+The full monitoring methodology and blocklist schema are published at [XEQMLabs/xeqm-sybil-resistance](https://github.com/XEQMLabs/xeqm-sybil-resistance).
 
 ---
 
-## 3) Quorum deduplication
+## Options Considered
+
+### Option 1 - Voluntary governance cap only
+
+The current governance cap of approximately 50 nodes per operator is enforced through public monitoring, community pressure, and a governance blocklist. When a violation is identified, the operator is contacted and given the opportunity to voluntarily reduce. Operators who do not comply face public identification and blocklisting of their registration keys.
+
+**Advantage:** No hard fork or code changes required.
+
+**Disadvantage:** A bad actor who deliberately obscures their identity across multiple wallets and providers faces no protocol-level resistance. Enforcement depends on the team's ability to identify operators, which is a heuristic process.
+
+### Option 2 - Per-wallet registration cap enforced in the protocol
+
+The registration code is changed to reject any new node registration from an operator address that already controls N or more active nodes. The network itself enforces the limit for single-wallet operators without governance action.
+
+**Advantage:** Automatically enforces a ceiling on single-wallet accumulation. Removes the need for manual intervention in the common case.
+
+**Disadvantage:** Does not stop a motivated actor willing to manage multiple wallets with distinct infrastructure. Offers a false sense of security if treated as a complete solution. The cap number requires careful calibration.
+
+After further analysis, this option has been superseded by quorum deduplication as the primary protocol control. Quorum deduplication addresses the same single-wallet concentration problem with broader coverage and cannot be bypassed by wallet splitting. The per-wallet cap is therefore not being implemented as a separate layer.
+
+### Option 3 - Quorum deduplication
 
 The quorum selection logic is modified so that in any given Pulse round, oracle session, or obligations quorum, at most one node per operator address may hold a validator seat. If a random draw selects two nodes from the same operator, one is replaced with a node from a different operator.
 
-**Advantage:** This limits the influence an operator can exercise in any single consensus round, regardless of how many nodes they run or how many wallets they use across their own addresses. An operator with 100 nodes and 100 separate wallets still only gets one validator seat per quorum. It cannot be bypassed without significant coordination overhead, and even then the effect is bounded by quorum size.
+This directly limits the consensus influence any single operator can exercise per round, regardless of how many nodes they run or how many wallets they use. An operator with 100 nodes across 100 separate wallets still holds only one validator seat per quorum. It cannot be bypassed without significant coordination overhead, and even then the effect is bounded by quorum size.
 
-It does not affect rewards. Block rewards are assigned by a separate mechanism — the protocol selects the next reward recipient based on which active node has waited the longest since its last reward, cycling through all active nodes in turn. That selection is completely independent of quorum participation. An operator with 100 nodes still earns block rewards proportional to those 100 nodes at the same rate as before. Quorum deduplication only caps simultaneous consensus influence, not income.
+This change does not affect block rewards. Reward selection cycles through all active nodes by wait time, independently of quorum participation. An operator with more nodes still earns block rewards proportional to those nodes. Quorum deduplication caps simultaneous consensus influence, not income.
 
-**Disadvantage:** This is a protocol change requiring a hard fork. It takes time to build, test on testnet, and coordinate activation with the operator community.
+**Disadvantage:** This is a protocol change requiring a hard fork. It requires careful implementation, adversarial testnet validation, and coordinated activation with the operator community.
 
 ---
 
-## My proposal
+## The Chosen Approach
 
-I propose we implement and enforce all three layers:
+We implement two active layers and retire the per-wallet cap option as redundant.
 
-1. Keep the voluntary governance cap and blocklist enforcement, which remains the fastest tool when I identify a node operator over the governance cap.
-2. Add a per-wallet registration cap as a protocol floor. It is not a hard barrier, but it bounds single-wallet accumulation automatically and removes the need for manual intervention in the common case.
-3. Build quorum deduplication at 1 seat per operator, test it on testnet, and activate it via hard fork.
+### Layer 1 - Per-IP node cap (near-term, protocol-enforced)
 
-The hard fork is the right long-term answer for the network. I need to build it carefully, run it on testnet against adversarial conditions, finalize parameters, and communicate a timeline to the operator community before activation.
+A per-IP node limit is being introduced at the protocol level as an immediate interim guardrail. Running a large number of nodes from a single IP address creates a single point of failure that can take a material fraction of the network offline simultaneously - not just a concentration of consensus influence, but a single infrastructure event that can drop many nodes at once.
 
-I want your feedback on this proposal. Please respond in the operator channel.
+The per-IP cap removes the most acute risk in the current network while the quorum deduplication hard fork is built and tested. This is an interim measure, not the primary long-term control.
+
+### Layer 2 - Quorum deduplication (primary protocol control, entering testnet)
+
+Quorum deduplication is the primary and definitive protocol-level control. The quorum selection logic is modified to allow at most one node per operator address to hold a validator seat in any given Pulse round, oracle session, or obligations quorum.
+
+This is entering testnet shortly. The testnet phase will validate the selection logic under normal and adversarial conditions, confirm that reward assignment is fully independent of quorum participation, and finalize activation parameters before the hard fork is proposed to the mainnet operator community.
+
+### Layer 3 - Governance monitoring and blocklist (ongoing)
+
+IP address monitoring, registration key pattern analysis, contributor slot graph analysis, and the governance blocklist remain active in parallel with the protocol controls. The governance cap of approximately 50 nodes per identifiable operator is enforced through this layer.
+
+A governance-managed public key blocklist prevents blocklisted keys from registering new nodes. Operating under a new key while the original is blocklisted creates a documented record of evasion and triggers escalating monitoring of the new key's associated infrastructure.
+
+This layer remains the fastest tool when concentration is identified before the protocol controls catch it, and it provides the human judgment layer that protocol code cannot replicate for cases involving deliberate obfuscation across providers.
+
+---
+
+## Current Status
+
+| Control | Status |
+|---|---|
+| Voluntary governance cap (~50 nodes per operator) | Active - enforced through monitoring and blocklist |
+| Per-IP node cap | Implementation in progress - protocol-enforced, near-term |
+| Per-wallet registration cap | Not proceeding - superseded by quorum deduplication |
+| Quorum deduplication hard fork | Entering testnet - mainnet activation follows testnet validation |
+
+---
+
+## What This Does Not Solve
+
+No combination of controls prevents a well-resourced, patient actor from accumulating nodes across many wallets and fully independent infrastructure at different providers with non-overlapping IP ranges. The protocol cannot distinguish that operator from 100 independent operators at the protocol level alone.
+
+What the combined approach does is raise the cost and operational complexity of large-scale evasion, eliminate the most common and careless forms of concentration, and ensure that even a sophisticated actor cannot convert that accumulation into disproportionate consensus influence in any single round. That is a realistic and honest goal for a pseudonymous network.
+
+Operators with feedback on the quorum deduplication proposal or the per-IP cap parameters are encouraged to respond in the Node Operators Telegram channel or open an issue in this repository.
