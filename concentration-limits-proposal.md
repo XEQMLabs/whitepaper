@@ -1,96 +1,166 @@
-# Node Concentration Limits - Proposal and Implementation Status
+# Node Concentration Limits - Network Survivability Enforcement
+## Technical Companion to the EXIOM Tokenomics Whitepaper
+### 07/26/2026
 
-As the network has grown to 693 active nodes across 184 operators, concentration of service nodes among a small number of operators has been an ongoing topic of discussion in the Telegram Node Operators channel. This document describes the problem, the options considered, the approach we have chosen, and the current implementation status of each layer.
-
-The network's Nakamoto coefficient - the number of independent operators who would need to cooperate to control 51% of active nodes - is currently 7, up from 4 at initial mainnet launch. Our target is 8. A single operator controlling 10% or more of active nodes is a meaningful concentration of consensus influence, independent of whether their intentions are good. The protocol should not require trusting any single operator.
-
-A node cap cannot be perfectly enforced in code on a pseudonymous network. An operator using multiple wallets, different IP addresses, and multiple hosting providers is difficult to detect at the protocol level. Any claim otherwise is not being honest with you. This is why the approach described here is layered: no single control is sufficient on its own, but together they raise the cost and complexity of evasion to the point where it becomes impractical for most actors and detectable for determined ones.
+This document is a companion to the EXIOM Tokenomics Whitepaper and assumes it has been read. The whitepaper covers what the concentration controls are and why they exist. This document covers the mechanical detail of how each control works, the testnet validation data behind HF22, the precise economic math behind the zero-reward modifier, the operator identity question on a privacy chain, and the residual risks the protocol does not fully solve.
 
 ---
 
-## The Problem
+## The Current Concentration Data
 
-On a privacy chain, the tools available for identifying operator concentration differ from those on a transparent public blockchain. Transaction-level graph analysis is unavailable by design - that is the privacy guarantee the chain provides to users. Service node operators, however, operate under different conditions. Participation in the service node network requires public announcement of an IP address, a public registration key, and observable contributor wallet relationships at the node registration level.
+| Country | Active nodes |
+|---|---|
+| France | 492 |
+| Germany | 70 |
+| United States | 55 |
+| Canada | 18 |
+| Poland | 13 |
+| United Kingdom | 10 |
+| Türkiye | 5 |
+| Australia | 4 |
+| Singapore | 2 |
+| Lithuania | 2 |
+| Serbia | 1 |
 
-These signals - IP address, subnet, registration key patterns, contributor wallet relationships, and behavioral timing across registrations - give the network a practical basis for identifying concentration without relying on transaction-level data. Operators are pseudonymous participants, not anonymous ones. An operator running many nodes from shared infrastructure has a visible footprint.
-
-The full monitoring methodology and blocklist schema are published at [XEQMLabs/xeqm-sybil-resistance](https://github.com/XEQMLabs/xeqm-sybil-resistance).
-
----
-
-## Options Considered
-
-### Option 1 - Voluntary governance cap only
-
-The current governance cap of approximately 50 nodes per operator is enforced through public monitoring, community pressure, and a governance blocklist. When a violation is identified, the operator is contacted and given the opportunity to voluntarily reduce. Operators who do not comply face public identification and blocklisting of their registration keys.
-
-**Advantage:** No hard fork or code changes required.
-
-**Disadvantage:** A bad actor who deliberately obscures their identity across multiple wallets and providers faces no protocol-level resistance. Enforcement depends on the team's ability to identify operators, which is a heuristic process.
-
-### Option 2 - Per-wallet registration cap enforced in the protocol
-
-The registration code is changed to reject any new node registration from an operator address that already controls N or more active nodes. The network itself enforces the limit for single-wallet operators without governance action.
-
-**Advantage:** Automatically enforces a ceiling on single-wallet accumulation. Removes the need for manual intervention in the common case.
-
-**Disadvantage:** Does not stop a motivated actor willing to manage multiple wallets with distinct infrastructure. Offers a false sense of security if treated as a complete solution. The cap number requires careful calibration.
-
-After further analysis, this option has been superseded by quorum deduplication as the primary protocol control. Quorum deduplication addresses the same single-wallet concentration problem with broader coverage and cannot be bypassed by wallet splitting. The per-wallet cap is therefore not being implemented as a separate layer.
-
-### Option 3 - Quorum deduplication
-
-The quorum selection logic is modified so that in any given Pulse round, oracle session, or obligations quorum, at most one node per operator address may hold a validator seat. If a random draw selects two nodes from the same operator, one is replaced with a node from a different operator.
-
-This directly limits the consensus influence any single operator can exercise per round, regardless of how many nodes they run or how many wallets they use. An operator with 100 nodes across 100 separate wallets still holds only one validator seat per quorum. It cannot be bypassed without significant coordination overhead, and even then the effect is bounded by quorum size.
-
-This change does not affect block rewards. Reward selection cycles through all active nodes by wait time, independently of quorum participation. An operator with more nodes still earns block rewards proportional to those nodes. Quorum deduplication caps simultaneous consensus influence, not income.
-
-**Disadvantage:** This is a protocol change requiring a hard fork. It requires careful implementation, adversarial testnet validation, and coordinated activation with the operator community.
+France at approximately 71% of the network is almost entirely one Contabo facility in Grand Est. The survivability threshold established in the whitepaper is 30% of active nodes per cluster, approximately 208 nodes at current count. Grand Est at 426 nodes is more than double that threshold.
 
 ---
 
-## The Chosen Approach
+## Why the Hard Forks Are Separated
 
-We implement two active layers and retire the per-wallet cap option as redundant.
+HF22 ships after successful testing. Wallet-key quorum deduplication and unbonding period unification have no dependency on Lokinet. Both have been validated on testnet and holding them while the Lokinet assessment is pending is unjustified delay. A sophisticated actor who reads the whitepaper before HF22 ships could attempt wallet splitting to pre-empt the quorum control, but doing so is detectable through uptime proof timing correlation and IP/ASN analysis and creates a documented record for governance action.
 
-### Layer 1 - Per-IP node cap (near-term, protocol-enforced)
-
-A per-IP node limit is being introduced at the protocol level as an immediate interim guardrail. Running a large number of nodes from a single IP address creates a single point of failure that can take a material fraction of the network offline simultaneously - not just a concentration of consensus influence, but a single infrastructure event that can drop many nodes at once.
-
-The per-IP cap removes the most acute risk in the current network while the quorum deduplication hard fork is built and tested. This is an interim measure, not the primary long-term control.
-
-### Layer 2 - Quorum deduplication (primary protocol control, entering testnet)
-
-Quorum deduplication is the primary and definitive protocol-level control. The quorum selection logic is modified to allow at most one node per operator address to hold a validator seat in any given Pulse round, oracle session, or obligations quorum.
-
-This is entering testnet shortly. The testnet phase will validate the selection logic under normal and adversarial conditions, confirm that reward assignment is fully independent of quorum participation, and finalize activation parameters before the hard fork is proposed to the mainnet operator community.
-
-### Layer 3 - Governance monitoring and blocklist (ongoing)
-
-IP address monitoring, registration key pattern analysis, contributor slot graph analysis, and the governance blocklist remain active in parallel with the protocol controls. The governance cap of approximately 50 nodes per identifiable operator is enforced through this layer.
-
-A governance-managed public key blocklist prevents blocklisted keys from registering new nodes. Operating under a new key while the original is blocklisted creates a documented record of evasion and triggers escalating monitoring of the new key's associated infrastructure.
-
-This layer remains the fastest tool when concentration is identified before the protocol controls catch it, and it provides the human judgment layer that protocol code cannot replicate for cases involving deliberate obfuscation across providers.
+HF23 ships after the Lokinet engineering assessment completes. If the assessment returns a configuration-change-only result, HF23 can follow HF22 quickly. If it returns a significant engineering effort, Grand Est stays exposed to the full survivability risk beyond quorum dedup until HF23 is ready. Separating the releases also gives clean failure domains: if something goes wrong post-HF23 activation there are fewer variables to isolate.
 
 ---
 
-## Current Status
+## HF22 Mechanics
+
+### Wallet-Key Quorum Deduplication
+
+The quorum selection algorithm runs a deduplication pass over each candidate set before finalizing. When the draw selects a candidate node, the algorithm checks its operator wallet address against all nodes already selected for the round. If a match is found, the candidate is replaced by drawing again from the remaining eligible pool, excluding all addresses already represented.
+
+The replacement draw does not cycle back through already-rejected candidates. It draws from the remaining unselected pool in the same probability-weighted order used for the initial draw. This preserves the statistical properties of the quorum selection without introducing a deterministic bias toward any particular set of remaining nodes.
+
+**Testnet validation results:**
+- Nine stall/recovery cycles completed
+- 100% recovery rate across all cycles
+- Zero manual intervention required in any cycle
+- Mainnet pre-HF22 baseline: 1,000 blocks, 100% Pulse, zero GOV_SIGNED blocks
+- R0 timeout analysis: no R0 timeouts introduced in production conditions. Density analysis of current mainnet confirms every high-density IP cluster is a single operator, meaning wallet-key dedup already provides full protection against the current whale deployments. The two largest single-IP deployments (58 nodes and 51 nodes respectively) are each one operator and are capped at one quorum seat per round under HF22.
+
+**What one quorum seat means in practice:** Quorum size and rotation frequency determine how often a node participates. At current network size, a single-seat cap means a concentrated operator's influence in oracle sessions, Pulse rounds, and obligations quorums is identical to that of an operator with one node. Their block reward income is unchanged.
+
+**The wallet-splitting gap and its interim detection:** An operator who splits 426 nodes across 10 wallets gets up to 10 quorum seats per round instead of one. This is the known gap HF23 closes. In the interim, wallet splitting is detectable through two signals already available without daemon changes. First, uptime proof timing: nodes on the same physical host or hypervisor submit proofs within milliseconds of each other, regardless of wallet key. A cluster of proofs arriving in sub-10ms windows from nodes registered to different wallets is a strong signal of shared infrastructure. Second, IP and ASN correlation: nodes on different wallets sharing an IP, subnet, or ASN are logged and flagged for governance review. An operator who wallet-splits but keeps all nodes in the same Contabo facility is identifiable through both signals and subject to governance action under the blocklist policy.
+
+### Unbonding Period Unification
+
+The forced deregistration unbonding period changes from 10,080 blocks (approximately 7 days) to 20,160 blocks (approximately 14 days), matching the voluntary withdrawal period. This is a consensus constant change.
+
+The original 7-day forced period was a deliberate choice during network stabilization to limit the penalty on operators experiencing infrastructure events outside their control. That rationale no longer applies. The network is stable, the decommission credit system provides the buffer for short outages, and a unified 14-day period removes an asymmetry that has no remaining justification.
+
+XEQM coins are locked on-chain during the unbonding period via the registration transaction. There is no mechanism to release the lock early without a protocol change. For documented infrastructure failures, governance can compensate missed rewards from the governance wallet as a XEQM transfer, but the on-chain lock runs its full duration regardless.
+
+---
+
+## HF23 Mechanics
+
+### Lokinet Proximity Clustering
+
+Lokinet (Low Latency Anonymous Routing Protocol, LLARP) routes traffic through the service node network at layer 3, supporting TCP, UDP, and ICMP. Every service node participates as a relay. The routing graph that emerges reflects physical network topology: nodes at the same facility route through the same upstream switch and the same datacenter backbone, producing correlated path selections and sub-millisecond inter-node latency. Nodes at different facilities route through different paths with measurably higher latency.
+
+The clustering algorithm ingests pairwise Lokinet routing latency and path overlap measurements across all active nodes and groups them into clusters using these measurements as the proximity signal. A cluster is not a fixed geographic region; it is a dynamic grouping of nodes whose routing behavior indicates shared physical infrastructure. Two nodes at different Contabo facilities in different countries may route through enough shared Contabo backbone infrastructure to appear in the same cluster if their path overlap is high enough. Two nodes at the same datacenter but on different physical machines with different upstream connections will appear in different clusters if their path overlap is low.
+
+Supplementary signals used alongside Lokinet proximity:
+
+**Uptime proof timing correlation.** The network already receives uptime proofs from all active nodes on a regular schedule. The timestamp distribution of proof arrivals from each node is recorded by the receiving nodes. Nodes on the same physical host or VM hypervisor submit proofs within a characteristic tight window, typically under 10 milliseconds. Clustering this arrival timing distribution provides a physical co-location signal that requires no daemon changes and works before Lokinet is active.
+
+**ASN analysis.** Each node's IP address maps to an Autonomous System Number via public BGP data. Nodes sharing an ASN share provider-level routing infrastructure and provider-level legal exposure. A provider that receives a jurisdiction-level order affecting all their infrastructure takes down all their ASN nodes simultaneously, regardless of how many Lokinet clusters they appear in. ASN concentration is tracked as a supplementary signal and contributes to governance review of operators near the cluster threshold.
+
+### Cluster Registration Cap
+
+At registration time, the protocol runs a proximity evaluation against all existing clusters. The registering node's Lokinet routing characteristics are measured against the centroid of each existing cluster. If the closest cluster already contains 30% or more of active nodes, the registration is rejected with a specific error code indicating cluster capacity and the node count of the nearest cluster.
+
+The rejection is deterministic: any node that routes similarly enough to an over-concentrated cluster to be assigned to it is rejected, regardless of the operator's wallet key, registration history, or stake amount. The operator cannot appeal the rejection through governance. The only path forward is to register on infrastructure that routes to a different cluster.
+
+The threshold is evaluated against active node count at the time of registration. As the network grows, the 30% threshold in absolute terms grows with it. An operator at the cap today can register additional nodes in a previously capped cluster as the network grows and the absolute cap rises, without migrating any existing nodes.
+
+### Zero-Reward Modifier
+
+The zero-reward modifier is applied at block reward calculation time. The reward calculation for a selected node includes a cluster eligibility check. If the node's cluster contains more nodes than the cap threshold, and the node's registration rank within that cluster is above the threshold (ranked oldest to newest), the reward calculation returns zero.
+
+The ranking is computed from the node's registration block height within its cluster assignment. The oldest registered node in the cluster gets rank 1, the most recently registered gets rank N. Nodes with rank greater than the cap threshold earn zero. Nodes with rank at or below the cap threshold earn the full standard reward. The ranking is recomputed each time the cluster assignment changes, which occurs when nodes migrate out of the cluster, when new nodes join, or when the cluster boundary shifts due to network topology changes.
+
+**The economic math for Grand Est:** At 426 nodes with a 208-node cap, 218 nodes earn zero block rewards. At self-hosted pricing of $0.53 per node per month, those 218 nodes cost $115.54 per month with zero income. At Pecunia pricing of $1.76 per node per month, the cost is $383.68 per month. The operator has two rational responses: migrate the excess nodes to non-concentrated clusters, restoring their rewards immediately upon the new registration being accepted, or deregister the excess nodes and recover the staked XEQM through the unbonding process. Either response reduces concentration. There is no rational basis for maintaining the excess nodes at zero reward.
+
+**Grace period mechanics:** At HF23 activation block, the protocol takes a snapshot of all active clusters and their node counts. Any cluster exceeding the 30% threshold is marked as over-concentrated. For 30 days following the activation block, the zero-reward modifier is suspended for all nodes, including those above the cap threshold. During the grace period, node owners can observe the node explorer's cluster assignments, plan migrations, and begin executing them. At the grace period expiry block, the modifier activates. Nodes that have migrated out of the over-concentrated cluster by that block earn full rewards from that block forward. Nodes still above the threshold earn zero from that block forward until they migrate.
+
+### Proximity Cluster Quorum Deduplication
+
+The HF23 quorum deduplication upgrade replaces the wallet address check with a cluster membership check. When the draw selects a candidate node, the algorithm checks its cluster assignment against all nodes already selected for the round. If two nodes share a cluster assignment, the second is replaced by a draw from the remaining pool, excluding all clusters already represented.
+
+The practical effect on a wallet-splitting operator: 10 wallet addresses across 426 nodes all in the same Contabo facility appear in the same proximity cluster. The cluster check catches them all as a single unit. One node from that cluster holds a seat. The other 425 nodes from that cluster do not, regardless of how many distinct wallet addresses they are registered under.
+
+### Minimum Cluster Count Requirement and Fallback Rule
+
+The EXIOM network quorum size is 12 seats per round. Proximity cluster deduplication therefore requires at least 12 distinct proximity clusters in the active node set to guarantee quorum formation. If the network produces fewer than 12 distinct clusters, the algorithm cannot satisfy the one-seat-per-cluster constraint and quorum formation fails.
+
+The current network distribution, once Lokinet proximity clustering is applied, is estimated to produce between 12 and 18 distinct clusters. This is uncomfortably close to the 12-seat minimum. Shared provider backbone infrastructure between nominally separate facilities can cause two distinct IP locations to merge into one proximity cluster in the Lokinet routing graph. Any such merger that reduces the cluster count below 12 breaks quorum formation entirely.
+
+The algorithm therefore implements a mandatory fallback rule:
+
+1. The algorithm attempts to fill all 12 seats with one node per distinct cluster, working through the available clusters in random order.
+2. If all distinct clusters are exhausted before 12 seats are filled, the algorithm enters a fallback pass.
+3. In the fallback pass, it allows a second node from each cluster, starting with the smallest clusters first. The least concentrated clusters receive a second seat before the most concentrated ones.
+4. The algorithm continues fallback passes, incrementing the maximum seats per cluster by one each pass, until 12 seats are filled.
+5. The most concentrated cluster, such as Grand Est under current conditions, receives additional seats only after all smaller clusters have been given their fallback allocation.
+
+Every round that triggers the fallback is logged with the cluster count that caused it. Governance monitors fallback frequency as a direct concentration risk indicator. A network with 12 or more distinct clusters never triggers the fallback. A network consistently triggering the fallback is signaling that HF23 concentration enforcement is not yet achieving adequate physical diversity and that the cluster cap or grace period enforcement requires governance attention.
+
+The fallback log is published in the node explorer alongside cluster assignments so the operator community can observe concentration risk in real time.
+
+---
+
+## Operator Identity on a Privacy Chain
+
+The protocol does not need to identify which human operator owns which nodes in order to enforce the cluster cap and zero-reward modifier. Both controls operate at the cluster level. What can and cannot be determined is useful context for governance monitoring but is not required for protocol enforcement.
+
+**What is deterministic from on-chain data:** nodes registered under the same operator wallet key are definitively the same operator. This is public information in the registration transaction.
+
+**What is inferable with high confidence from Lokinet and timing data:** the number of distinct physical hosts underlying a cluster of nodes, regardless of how many wallet keys they use. Five wallet keys each running 85 nodes, all on the same two physical servers, produce two distinct timing signatures and two Lokinet proximity centroids, not five.
+
+**What cannot be determined on a privacy chain:** whether two different wallet keys with distinct infrastructure belong to the same human operator. The funding source of each wallet key is private by design. A sophisticated operator using five wallets funded from five different sources through the privacy chain's transaction layer presents five distinct identities at the protocol level.
+
+For survivability enforcement, this does not matter. The cluster contains 426 nodes. The oldest 208 earn rewards. The newest 218 earn zero. The operator's identity is irrelevant to that calculation.
+
+---
+
+## Implementation Status
 
 | Control | Status |
 |---|---|
-| Voluntary governance cap (~50 nodes per operator) | Active - enforced through monitoring and blocklist |
-| Per-IP node cap | Implementation in progress - protocol-enforced, near-term |
-| Per-wallet registration cap | Not proceeding - superseded by quorum deduplication |
-| Quorum deduplication hard fork | Entering testnet - mainnet activation follows testnet validation |
+| Operator wallet-key quorum dedup | HF22, entering testnet, validated |
+| Unbonding period unification, 7 to 14 days | HF22, entering testnet |
+| Lokinet activation as network transport | Engineering assessment underway |
+| Proximity clustering algorithm | Design phase, pending Lokinet assessment |
+| Cluster registration cap, 30% threshold | HF23, design phase |
+| Zero-reward modifier for excess nodes | HF23, design phase |
+| Grace period mechanism | HF23, design phase |
+| Proximity cluster quorum dedup with fallback rule | HF23, design phase |
+| Minimum cluster count monitoring and fallback logging | HF23, design phase |
+| Uptime proof timing correlation tooling | No daemon changes required, tooling in development |
+| ASN clustering supplement | No daemon changes required, tooling in development |
 
 ---
 
-## What This Does Not Solve
+## What These Controls Do Not Solve
 
-No combination of controls prevents a well-resourced, patient actor from accumulating nodes across many wallets and fully independent infrastructure at different providers with non-overlapping IP ranges. The protocol cannot distinguish that operator from 100 independent operators at the protocol level alone.
+**Provider-level legal concentration.** A provider receiving a jurisdiction-level legal order affecting all their global infrastructure takes down all their nodes simultaneously, even if those nodes appear in multiple Lokinet proximity clusters. ASN analysis surfaces this risk but the protocol cannot enforce provider diversity without requiring operator disclosure of their provider identity. The geographic spread naturally produced by the cluster cap substantially mitigates this risk in practice, since operators forced to distribute across clusters will in practice use multiple providers.
 
-What the combined approach does is raise the cost and operational complexity of large-scale evasion, eliminate the most common and careless forms of concentration, and ensure that even a sophisticated actor cannot convert that accumulation into disproportionate consensus influence in any single round. That is a realistic and honest goal for a pseudonymous network.
+**Determination of human operator identity across privacy-chain wallet splits.** As described above, a sophisticated operator using multiple wallets funded through the privacy chain cannot be identified at the protocol level. The cluster cap and zero-reward modifier address the failure domain risk regardless of identity. The quorum dedup closes the consensus influence gap in HF23. The residual risk is that a sophisticated operator runs many nodes across many genuinely distinct clusters, accumulating block reward income proportional to their node count while contributing proportionally to network health. This is the acceptable outcome: concentrated consensus influence is bounded; distributed capital participation is rewarded.
 
-Operators with feedback on the quorum deduplication proposal or the per-IP cap parameters are encouraged to respond in the Node Operators Telegram channel or open an issue in this repository.
+Operators with questions about cluster assignment, migration planning, or the HF22/HF23 timeline are encouraged to post in the Node Operators Telegram channel or open an issue in this repository.
+
+---
+
+*This document does not constitute financial or legal advice. XEQM is a utility coin for the EXIOM platform, not an investment product. Token classification, securities status, and applicable regulations vary by jurisdiction. Participants should consult their local legal and regulatory framework before acquiring or operating with XEQM. XEQM Labs does not encourage purchasing XEQM on the basis of speculative price appreciation.*
