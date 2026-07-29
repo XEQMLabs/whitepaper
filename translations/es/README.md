@@ -165,6 +165,7 @@ El protocolo aplica un tamaño máximo de dominio de fallo: ningún clúster de 
 | Português | [../pt/README.md](../pt/README.md) |
 | Türkçe | [../tr/README.md](../tr/README.md) |
 | Polski | [../pl/README.md](../pl/README.md) |
+| Bahasa Indonesia | [../id/README.md](../id/README.md) |
 
 ---
 
