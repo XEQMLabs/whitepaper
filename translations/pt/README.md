@@ -153,6 +153,7 @@ Um VPS pago por aproximadamente 5,28 USD por mês pode executar 10 nós de servi
 | 中文 | [../zh/README.md](../zh/README.md) |
 | Türkçe | [../tr/README.md](../tr/README.md) |
 | Polski | [../pl/README.md](../pl/README.md) |
+| Bahasa Indonesia | [../id/README.md](../id/README.md) |
 
 ---
 

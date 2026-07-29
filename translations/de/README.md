@@ -153,6 +153,7 @@ Ein bezahlter VPS für ca. 5,28 USD pro Monat kann 10 Service-Nodes betreiben, w
 | Português | [../pt/README.md](../pt/README.md) |
 | Türkçe | [../tr/README.md](../tr/README.md) |
 | Polski | [../pl/README.md](../pl/README.md) |
+| Bahasa Indonesia | [../id/README.md](../id/README.md) |
 
 ---
 

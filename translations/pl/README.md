@@ -153,6 +153,8 @@ Płatny VPS za około 5,28 USD miesięcznie może obsługiwać 10 węzłów usł
 | 中文 | [../zh/README.md](../zh/README.md) |
 | Português | [../pt/README.md](../pt/README.md) |
 | Türkçe | [../tr/README.md](../tr/README.md) |
+| Bahasa Indonesia | [../id/README.md](../id/README.md) |
+
 
 ---
 

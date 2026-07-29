@@ -360,6 +360,7 @@ Community translations of this whitepaper are maintained in the translations fol
 | Português | [translations/pt/README.md](./translations/pt/README.md) |
 | Türkçe | [translations/tr/README.md](./translations/tr/README.md) |
 | Polski | [translations/pl/README.md](./translations/pl/README.md) |
+| Bahasa Indonesia | [translations/id/README.md](./translations/id/README.md)
 
 ---
 
