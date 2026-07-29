@@ -176,6 +176,8 @@ A 30-day grace period applies at HF23 activation. All nodes earn full rewards du
 
 **Proximity cluster quorum deduplication.** Upgrades HF22 wallet-key dedup to proximity cluster dedup. At most one node per proximity cluster per round, regardless of wallet structure. Closes the wallet-splitting gap.
 
+The quorum size is 12 seats per round. The dedup therefore requires at least 12 distinct proximity clusters to function without a fallback. Given current network topology, the cluster count at HF23 activation may be close to this minimum. The algorithm implements a mandatory fallback: if all distinct clusters are exhausted before 12 seats are filled, additional seats are allocated starting from the smallest (least concentrated) clusters first, before the most concentrated cluster receives a second seat. Fallback frequency is logged and published in the node explorer as a real-time concentration risk indicator. A network never triggering the fallback has achieved adequate physical diversity.
+
 ### Additional Controls
 
 **Capital cost barrier.** The 100,000 XEQM minimum operator stake ensures every operator commits real capital to each node. Running N nodes requires at least N x 100,000 XEQM staked.
@@ -264,8 +266,10 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 | Managed hosting cost (Pecunia) | $1.76/node/month |
 | Nakamoto coefficient (July 2026) | 7 (target: 8; 693 nodes, 184 operators) |
 | Oracle external activation | Nakamoto >= 6 reached; gated on Phase 3 completion |
+| Quorum size | 12 seats per round |
 | Quorum dedup, HF22 | One operator wallet address per quorum seat per round |
 | Quorum dedup, HF23 | One proximity cluster per quorum seat per round (requires Lokinet) |
+| Quorum dedup fallback, HF23 | If fewer than 12 distinct clusters exist, smallest clusters receive additional seats first before most concentrated clusters; fallback frequency logged and published |
 | Network survivability cap, HF23 | 30% of active nodes per proximity cluster (~208 nodes at current count) |
 | Zero-reward modifier, HF23 | Zero block rewards for nodes above cluster cap, ranked by registration age |
 | Core repos | github.com/XEQMLabs |
@@ -284,7 +288,7 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 
 **HF22, entering testnet.** Two validated consensus changes with no Lokinet dependency: operator wallet-key quorum deduplication (one operator address per quorum seat per round) and unbonding period unification (forced deregistration extended from 7 to 14 days).
 
-**HF23, design phase, pending Lokinet assessment.** Once Lokinet is active as the network transport: Lokinet activation as primary transport replacing publicly announced IP addresses; proximity cluster registration cap (registrations rejected when a cluster exceeds 30% of active nodes); zero-reward modifier for nodes above the cap threshold ranked by registration age; upgrade of quorum deduplication from wallet-key to proximity cluster. A 30-day grace period applies at activation before the zero-reward modifier takes effect.
+**HF23, design phase, pending Lokinet assessment.** Once Lokinet is active as the network transport: Lokinet activation as primary transport replacing publicly announced IP addresses; proximity cluster registration cap (registrations rejected when a cluster exceeds 30% of active nodes); zero-reward modifier for nodes above the cap threshold ranked by registration age; upgrade of quorum deduplication from wallet-key to proximity cluster, with a mandatory fallback rule ensuring quorum formation is always possible even when fewer than 12 distinct clusters exist (smallest clusters receive additional seats first before most concentrated clusters, with fallback frequency logged and published as a concentration risk indicator). A 30-day grace period applies at activation before the zero-reward modifier takes effect.
 
 **Phase 6, Formal governance.** Structured proposal process, weighted voting for operators, long-term transition away from founding-team governance.
 
@@ -338,6 +342,24 @@ The EXIOM RFQ platform is a peer-to-peer over-the-counter trading system with cr
 Once Lokinet is active, the RFQ platform will be accessible as a Lokinet hidden service. Neither the requester's nor the LP's IP address will be visible to the platform. The oracle pricing layer allows a counterparty to prove that a fill occurred at or better than a reference price from a whitelisted source, without revealing the exact fill price to the platform or the other party.
 
 RFQ application specification and data model are complete. Active development proceeds in Phase 2 on the API layer. Full trading platform production is a Phase 3 deliverable, dependent on the EXIOM API reaching production and the oracle MVP completing its internal proof of concept.
+
+---
+
+---
+
+## Available Languages
+
+Community translations of this whitepaper are maintained in the translations folder. In the event of any conflict between a translation and the English version, the English version governs.
+
+| Language | Whitepaper |
+|---|---|
+| Español | [translations/es/README.md](./translations/es/README.md) |
+| Français | [translations/fr/README.md](./translations/fr/README.md) |
+| Deutsch | [translations/de/README.md](./translations/de/README.md) |
+| 中文 | [translations/zh/README.md](./translations/zh/README.md) |
+| Português | [translations/pt/README.md](./translations/pt/README.md) |
+| Türkçe | [translations/tr/README.md](./translations/tr/README.md) |
+| Polski | [translations/pl/README.md](./translations/pl/README.md) |
 
 ---
 

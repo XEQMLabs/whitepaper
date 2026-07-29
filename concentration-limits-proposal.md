@@ -26,6 +26,24 @@ France at approximately 71% of the network is almost entirely one Contabo facili
 
 ---
 
+## What This Means for Node Operators
+
+This section answers the question directly: how does HF23 affect how you run your nodes?
+
+**HF23 does not require one node per IP, one node per VPS, or one node per wallet.** The cap is 30% of the active network per proximity cluster, currently approximately 208 nodes. An operator running 10, 50, or even 100 nodes on shared infrastructure is completely unaffected by HF23 as long as their cluster stays below that threshold. You can run multiple nodes on one machine, one VPS account, and one wallet. Nothing in HF23 changes that.
+
+**The zero-reward modifier applies only to nodes above the 208-node cluster threshold.** The oldest registered nodes in a cluster earn full rewards up to that threshold. Only nodes ranked above it in an over-concentrated cluster earn zero, and only until they are migrated to a less concentrated cluster.
+
+**The quorum deduplication caps consensus influence per round, not node count or income.** An operator running 50 nodes on one VPS earns block rewards on all 50 and manages their infrastructure exactly as they do today. They receive one quorum seat per cluster per round instead of potentially many, which is the intended outcome.
+
+**The right approach for a new operator** is to check the node explorer, see where existing clusters are concentrated, and deploy into a lightly populated region. Ten nodes on one server in Brazil or Argentina works perfectly fine under HF23 because those regions are nowhere near the 30% threshold. Full rewards, full quorum participation, no issues.
+
+**The dynamic works in your favor if you deploy into sparse regions.** If a region eventually fills up, the node explorer shows it and operators have a financial incentive to move before the cap affects them. Operators who got there first keep full rewards on their oldest nodes up to the threshold. New registrations into an over-concentrated cluster earn nothing immediately, so the economics naturally push new deployments toward lighter regions.
+
+**The specific problem HF23 solves** is one facility in France currently hosting approximately 426 nodes, 61% of the network. If that facility goes offline the network stalls. The goal is getting that cluster below 208 nodes. Every other operator running a responsible multi-node setup in a non-concentrated region is exactly what the network needs more of.
+
+---
+
 ## Why the Hard Forks Are Separated
 
 HF22 ships after successful testing. Wallet-key quorum deduplication and unbonding period unification have no dependency on Lokinet. Both have been validated on testnet and holding them while the Lokinet assessment is pending is unjustified delay. A sophisticated actor who reads the whitepaper before HF22 ships could attempt wallet splitting to pre-empt the quorum control, but doing so is detectable through uptime proof timing correlation and IP/ASN analysis and creates a documented record for governance action.
@@ -160,6 +178,22 @@ For survivability enforcement, this does not matter. The cluster contains 426 no
 **Determination of human operator identity across privacy-chain wallet splits.** As described above, a sophisticated operator using multiple wallets funded through the privacy chain cannot be identified at the protocol level. The cluster cap and zero-reward modifier address the failure domain risk regardless of identity. The quorum dedup closes the consensus influence gap in HF23. The residual risk is that a sophisticated operator runs many nodes across many genuinely distinct clusters, accumulating block reward income proportional to their node count while contributing proportionally to network health. This is the acceptable outcome: concentrated consensus influence is bounded; distributed capital participation is rewarded.
 
 Operators with questions about cluster assignment, migration planning, or the HF22/HF23 timeline are encouraged to post in the Node Operators Telegram channel or open an issue in this repository.
+
+---
+
+## Available Languages
+
+Community translations of this document are maintained in the whitepaper repository. In the event of any conflict between a translation and the English version, the English version governs.
+
+| Language | Document |
+|---|---|
+| Español | [translations/es/concentration-limits-proposal.md](./translations/es/concentration-limits-proposal.md) |
+| Français | [translations/fr/concentration-limits-proposal.md](./translations/fr/concentration-limits-proposal.md) |
+| Deutsch | [translations/de/concentration-limits-proposal.md](./translations/de/concentration-limits-proposal.md) |
+| 中文 | [translations/zh/concentration-limits-proposal.md](./translations/zh/concentration-limits-proposal.md) |
+| Português | [translations/pt/concentration-limits-proposal.md](./translations/pt/concentration-limits-proposal.md) |
+| Türkçe | [translations/tr/concentration-limits-proposal.md](./translations/tr/concentration-limits-proposal.md) |
+| Polski | [translations/pl/concentration-limits-proposal.md](./translations/pl/concentration-limits-proposal.md) |
 
 ---
 
