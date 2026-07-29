@@ -153,6 +153,7 @@ XEQM Labs 不鼓励基于投机性价格升值购买 XEQM。
 | Português | [../pt/README.md](../pt/README.md) |
 | Türkçe | [../tr/README.md](../tr/README.md) |
 | Polski | [../pl/README.md](../pl/README.md) |
+| Bahasa Indonesia | [../id/README.md](../id/README.md) |
 
 ---
 
