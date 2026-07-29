@@ -153,6 +153,7 @@ Un VPS payant à environ 5,28 USD par mois peut faire fonctionner 10 nœuds de s
 | Português | [../pt/README.md](../pt/README.md) |
 | Türkçe | [../tr/README.md](../tr/README.md) |
 | Polski | [../pl/README.md](../pl/README.md) |
+| Bahasa Indonesia | [../id/README.md](../id/README.md) |
 
 ---
 
