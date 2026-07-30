@@ -115,20 +115,20 @@ Any technically capable operator can run an API node, register with the platform
 
 Many cloud VPS providers offer a free service tier that can support service node operation at zero monthly cost. A paid VPS at approximately $5.28 per month can run 10 service nodes, bringing per-node hosting cost to roughly $0.53 per month. Managed hosting through Pecunia is available at $1.76 per node per month.
 
-At 700 active nodes, each node earns approximately 516 XEQM per month. Net monthly yield per node after hosting costs:
+At 726 active nodes (as of July 29, 2026), each node earns approximately 498 XEQM per month. Net monthly yield per node after hosting costs:
 
 | Price | Gross/mo | Net: self-hosted ($0.53) | Net: Pecunia ($1.76) | APY on 200k stake |
 |---|---|---|---|---|
-| $0.01547 (today) | $0.008 | -$0.52 | -$1.75 | 3.1% |
-| $0.05 | $0.026 | -$0.50 | -$1.73 | 3.1% |
-| $0.10 | $0.052 | -$0.48 | -$1.71 | 3.1% |
-| $0.25 | $0.129 | -$0.40 | -$1.63 | 3.1% |
-| $0.50 | $0.258 | -$0.27 | -$1.50 | 3.1% |
-| $1.00 | $0.516 | -$0.01 | -$1.24 | 3.1% |
-| $2.00 | $1.032 | +$0.50 | -$0.73 | 3.1% |
-| $5.00 | $2.580 | +$2.05 | +$0.82 | 3.1% |
+| $0.01547 (today) | $7.70 | +$7.17 | +$5.94 | 3.0% |
+| $0.05 | $24.90 | +$24.37 | +$23.14 | 3.0% |
+| $0.10 | $49.80 | +$49.27 | +$48.04 | 3.0% |
+| $0.25 | $124.50 | +$123.97 | +$122.74 | 3.0% |
+| $0.50 | $249.00 | +$248.47 | +$247.24 | 3.0% |
+| $1.00 | $498.00 | +$497.47 | +$496.24 | 3.0% |
+| $2.00 | $996.00 | +$995.47 | +$994.24 | 3.0% |
+| $5.00 | $2,490.00 | +$2,489.47 | +$2,488.24 | 3.0% |
 
-APY on block rewards is constant at 3.1% because reward value and stake value scale with price together. What changes with price is USD cash flow relative to fixed USD hosting costs. API node duty adds a second income stream that is revenue-based and scales with actual platform usage.
+APY on block rewards is 3.0% because reward value and stake value scale with price together. What changes with price is USD cash flow relative to fixed USD hosting costs. At current prices, both self-hosted and Pecunia-managed nodes are cash-flow positive — break-even sits at $0.001/XEQM for self-hosted and $0.004/XEQM for Pecunia, roughly 15× and 4× below today's price respectively. API node duty adds a second income stream that is revenue-based and scales with actual platform usage.
 
 ### Contributor Economics
 
