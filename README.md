@@ -9,17 +9,17 @@
 | Component | Status |
 |---|---|
 | EXIOM mainnet | Live, operational since May 6, 2026 |
-| Service node network | Live — 944 active service nodes as of September 27, 2026 |
-| Lokinet (LLARP) | Present in codebase, activation status under engineering assessment |
+| Service node network | Live — 943 active service nodes as of September 27, 2026 |
+| Lokinet (LLARP) | Committed as HF23's network transport; implementation begins Q4 2026 |
 | XEQ to XEQM coin swap | Delivered and closed, 35-day production run, public auditable ledger |
 | GUI wallet | Live, github.com/XEQMLabs/XEQMLabs-GUI |
 | Node explorer | Live, active service node monitoring |
 | EXIOM ARC Compliance Oracle | Live on mainnet (Robinhood Chain, chainId 4663); 11-member operator committee as of September 27, 2026 |
-| EXIOM developer API | Live in beta — self-serve keys, compliance and verification endpoints, OpenAPI at /docs (September 27, 2026) |
+| EXIOM developer API | Live in beta — self-serve keys, signed compliance claims and a verification engine, OpenAPI at /docs; free-to-build with prepaid per-call usage rolling out (September 27, 2026) |
 | EXIOM Privacy Oracle (TLSNotary / ZK) | Foundations live (verification engine, oracle sessions); full private-web-data oracle in Phase 3 |
 | EXIOM RFQ trading platform | In development, Phase 2/3, XEQM/BTC first pair |
-| HF22, wallet-key quorum dedup and unbonding unification | Entering testnet, validated, no Lokinet dependency |
-| HF23, proximity cluster cap, reward modifier, Lokinet transport | Design phase, pending Lokinet engineering assessment |
+| HF22, wallet-key quorum dedup and unbonding unification | Built and validated; scheduled to activate at mainnet block 219120 (~early October 2026) |
+| HF23, proximity cluster cap, reward modifier, Lokinet transport | In design; Lokinet transport committed; targeted Q4 2026 |
 | Formal on-chain governance | Planned, Phase 6 |
 
 ---
@@ -34,13 +34,13 @@ XEQM is a native Layer 1 coin, not tokenized on any other chain, not an ERC-20 o
 
 ### The EXIOM Product Family
 
-**EXIOM Service Node Network.** Live on mainnet. A global set of service nodes secures the chain, earns block rewards, and forms the infrastructure layer on which all other EXIOM products run. 944 active service nodes as of September 27, 2026.
+**EXIOM Service Node Network.** Live on mainnet. A global set of service nodes secures the chain, earns block rewards, and forms the infrastructure layer on which all other EXIOM products run. 943 active service nodes as of September 27, 2026.
 
 **EXIOM Coin Swap.** A commercial product enabling projects to migrate their holder community from a legacy chain to a new chain with full cryptographic auditability. The pilot was the migration of XEQ holders to XEQM on the EXIOM mainnet, running for 35 days with every submission processed through a cryptographically verified ledger bearing a public SHA256 fingerprint. The product is available to other projects requiring a verifiable chain migration.
 
 **EXIOM ARC Compliance Oracle.** Live on mainnet. The platform's first oracle product: a committee of XEQM service-node operators — each running a lightweight oracle sidecar — that produces BLS-aggregate, EIP-712 signed compliance attestations (for example, that an address is eligible for a given jurisdiction) which applications consume through the developer API. It is deployed on Robinhood Chain (chainId 4663) and runs an 11-member operator committee as of September 27, 2026. Running the sidecar is how a service-node operator earns additional, usage-based revenue on top of block rewards.
 
-**EXIOM Developer API.** Live in beta. A structured API exposing the platform's compliance and verification capabilities, with self-serve credentials (a DID plus API key), an OpenAPI 3.1 specification, and webhooks. Developers build for free on a generous allowance and pay for production usage in XEQM, consumed per call. Phase 2, active.
+**EXIOM Developer API.** Live in beta. A structured API exposing the platform's compliance and verification capabilities — signed compliance claims and a verification engine (signed-claims, TLSNotary, and zero-knowledge mechanisms) — with self-serve access (a DID plus API key), an OpenAPI 3.1 specification, webhooks, and idempotent requests. Developers build for free on a generous monthly allowance and pay for production usage in XEQM, consumed per call. Phase 2, active.
 
 **EXIOM Privacy Oracle.** Designed, foundations in place. The broader evolution of the oracle: proving facts about private web data (via TLSNotary and zero-knowledge techniques) without exposing the underlying source. The verification engine and oracle-session endpoints that underpin it are already live; the full private-web-data oracle is a Phase 3 deliverable. Both the EXIOM RFQ platform and third-party applications can consume oracle outputs.
 
@@ -66,7 +66,7 @@ Beyond the starting supply, new XEQM enters circulation through two protocol-lev
 
 ### Block Emissions
 
-The network produces a new block every 60 seconds and awards 8.25 XEQM to the selected service node, generating 11,880 XEQM per day. At 700 active nodes, each node earns approximately 17.0 XEQM per day, or 516 XEQM per month.
+The network produces a new block every 60 seconds and awards 8.25 XEQM to the selected service node, generating 11,880 XEQM per day. At 943 active nodes (September 27, 2026), each node earns approximately 12.6 XEQM per day, or about 380 XEQM per month.
 
 Starting with HF21, block rewards are distributed on a weekly batching schedule. Prior to HF21, rewards were issued every 20 blocks. Rewards now accumulate over each 10,080-block window (approximately 7 days) and are paid out at the end of each window. The total emission rate is unchanged; only the payment cadence has shifted.
 
@@ -121,7 +121,7 @@ Baseline hardware to run a service node (and its oracle sidecar): 4 CPU cores, 8
 
 Many cloud VPS providers offer a free service tier that can support service node operation at zero monthly cost. A paid VPS at approximately $5.28 per month can run 10 service nodes, bringing per-node hosting cost to roughly $0.53 per month. Managed hosting through Pecunia is available at $1.76 per node per month.
 
-Per-node block rewards scale inversely with the active node count: at 944 active service nodes (September 27, 2026), the network's 11,880 XEQM daily emission works out to roughly 12.6 XEQM per node per day, about 377 XEQM per month. Because both the reward and the stake are denominated in XEQM, the block-reward APY is approximately 3% independent of price; hosting is the only material recurring cost, at roughly $0.53 per node per month self-hosted or $1.76 through Pecunia. Running the oracle sidecar (Section 10) adds a second income stream that is revenue-based and scales with actual platform usage, funded from developer consumption rather than emission.
+Per-node block rewards scale inversely with the active node count: at 943 active service nodes (September 27, 2026), the network's 11,880 XEQM daily emission works out to roughly 12.6 XEQM per node per day, about 380 XEQM per month. Because both the reward and the stake are denominated in XEQM, the block-reward APY is approximately 2.3% independent of price; hosting is the only material recurring cost, at roughly $0.53 per node per month self-hosted or $1.76 through Pecunia. Running the oracle sidecar (Section 10) adds a second income stream that is revenue-based and scales with actual platform usage, funded from developer consumption rather than emission.
 
 ### Contributor Economics
 
@@ -139,15 +139,15 @@ Nodes remain active indefinitely with maintained collateral and performance requ
 
 The EXIOM network makes reliability commitments to developers. A network that can be taken offline by a single datacenter outage cannot make those commitments. The protocol enforces a maximum failure domain size: no single physical facility, datacenter, or routing cluster may host more than 30% of active nodes.
 
-At 944 nodes (September 27, 2026), 30% is approximately 283 nodes. Losing any single facility can take at most 283 nodes offline simultaneously, leaving at least 661 nodes operational, sufficient to maintain block production and quorum formation without cascading decommissions. This is an engineering requirement, not a decentralization preference.
+At 943 nodes (September 27, 2026), 30% is approximately 283 nodes. Losing any single facility can take at most 283 nodes offline simultaneously, leaving at least 660 nodes operational, sufficient to maintain block production and quorum formation without cascading decommissions. This is an engineering requirement, not a decentralization preference.
 
 ### Two Hard Forks
 
 Survivability enforcement is delivered in two stages, separated to reduce risk and ship validated work immediately.
 
-**HF22, entering testnet:** Operator wallet-key quorum deduplication and unbonding period unification. No Lokinet dependency. Validated through nine stall/recovery cycles with 100% recovery rate and zero intervention.
+**HF22, built and scheduled:** Operator wallet-key quorum deduplication and unbonding period unification. No Lokinet dependency. Validated through nine stall/recovery cycles with 100% recovery rate and zero intervention, and scheduled to activate at mainnet block 219120 (approximately early October 2026); nodes are being upgraded ahead of activation.
 
-**HF23, design phase:** Proximity cluster registration cap, zero-reward modifier for excess nodes, and upgrade of quorum deduplication from wallet-key to proximity cluster. All three depend on Lokinet activation as the primary network transport. Timeline depends on the Lokinet engineering assessment currently underway.
+**HF23, in design, targeted Q4 2026:** Proximity cluster registration cap, zero-reward modifier for excess nodes, and upgrade of quorum deduplication from wallet-key to proximity cluster. All three depend on Lokinet as the primary network transport, which is a committed part of HF23. Implementation begins in Q4 2026.
 
 ### HF22 Controls
 
@@ -183,13 +183,13 @@ The quorum size is 12 seats per round. The dedup therefore requires at least 12 
 
 **Governance blocklist.** A governance-managed public key blocklist prevents blocklisted registration keys from registering new nodes.
 
-**Nakamoto coefficient target.** The network targets a coefficient of at least 8. As of July 2026, with 693 active nodes across 184 operators, the coefficient was 7; the active node count has since grown to 944 as of September 27, 2026 (updated operator count and coefficient to be published).
+**Nakamoto coefficient target.** The network targets an operator coefficient of at least 8. As of September 27, 2026, across 943 active service nodes and 204 operators, the operator Nakamoto coefficient — the minimum number of operators controlling a majority of active nodes — is 9, meeting the target (up from 7 across 184 operators in July 2026). Physical-facility concentration is a separate and more acute problem: a single datacenter region still hosts a majority of nodes, which is exactly the concentration HF23's proximity-cluster cap is designed to break.
 
 The full concentration limits proposal is at [concentration-limits-proposal.md](https://github.com/XEQMLabs/whitepaper/blob/main/concentration-limits-proposal.md). The sybil resistance methodology is at [XEQMLabs/xeqm-sybil-resistance](https://github.com/XEQMLabs/xeqm-sybil-resistance).
 
 ### Lokinet as the Future Network Transport
 
-The EXIOM network's addressing infrastructure is planned to migrate from publicly announced IP addresses to Lokinet addressing as part of HF23. Lokinet (Low Latency Anonymous Routing Protocol, LLARP) is a layer 3 onion routing protocol routing any IP-based traffic through multiple service nodes via multi-hop onion routing, with no single node in the path knowing both the origin and destination.
+The EXIOM network's addressing infrastructure will migrate from publicly announced IP addresses to Lokinet addressing as part of HF23 (targeted Q4 2026). Lokinet (Low Latency Anonymous Routing Protocol, LLARP) is a layer 3 onion routing protocol routing any IP-based traffic through multiple service nodes via multi-hop onion routing, with no single node in the path knowing both the origin and destination.
 
 Once Lokinet is active:
 
@@ -198,13 +198,13 @@ Once Lokinet is active:
 - The RFQ trading platform will be accessible as a hidden service, concealing requester and LP IP addresses from the platform
 - Oracle session communication between prover and verifier quorum will be routed over Lokinet, eliminating the centralized coordinator trust assumption
 
-Lokinet activation is currently under engineering assessment. The LLARP codebase is present in the EXIOM repository. Engineering is evaluating whether activation requires configuration changes only or additional work. The outcome determines the HF23 timeline.
+Lokinet is a committed part of HF23, targeted for Q4 2026. The LLARP codebase is present in the EXIOM repository; implementation of Lokinet as the primary network transport begins in Q4 2026.
 
 ---
 
 ## 6. XEQM as a Utility Coin
 
-XEQM demand comes from three sources. Node staking locks the largest share of supply, approximately 50.6% at 700 nodes. Developer consumption creates a continuous velocity layer: applications pay for production API usage in XEQM, so platform adoption converts directly into recurring demand for the coin. Oracle access adds a third layer for higher-volume consumers.
+XEQM demand comes from three sources. Node staking locks the largest share of supply, approximately 68% at the current 943 active nodes (September 27, 2026). Developer consumption creates a continuous velocity layer: applications pay for production API usage in XEQM, so platform adoption converts directly into recurring demand for the coin. Oracle access adds a third layer for higher-volume consumers.
 
 Access follows a prepaid, usage-based model rather than a stake-to-unlock gate — developers do not have to acquire and lock a fixed stake to build:
 
@@ -252,19 +252,19 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 | Unbonding period, voluntary withdrawal | 14 days, rewards continue |
 | Unbonding period, forced deregistration | 14 days, no rewards (HF22) |
 | Total supply | 276,917,604 XEQM at launch, growing through scheduled emissions |
-| Supply locked at 700 nodes | 140,000,000 XEQM (~50.6% of starting supply) |
-| Freely circulating at 700 nodes | ~137,000,000 XEQM at starting supply, growing with emissions |
-| Solo operator APY at 700 nodes | ~3.1% (block rewards only, paid weekly via HF21) |
+| Supply locked at 943 nodes (Sep 27, 2026) | ~188,600,000 XEQM (~68% of starting supply) |
+| Freely circulating at 943 nodes | ~88,300,000 XEQM at starting supply, growing with emissions |
+| Solo operator APY at 943 nodes | ~2.3% (block rewards only, paid weekly via HF21) |
 | Self-hosted cost per node | ~$0.53/month ($5.28/mo VPS, 10 nodes) |
 | Managed hosting cost (Pecunia) | $1.76/node/month |
-| Active service nodes (September 27, 2026) | 944 |
-| Nakamoto coefficient (July 2026) | 7 (target: 8; 693 nodes, 184 operators; recomputation for 944 nodes pending) |
+| Active service nodes (September 27, 2026) | 943 |
+| Operator Nakamoto coefficient (Sep 27, 2026) | 9 — majority control; target >= 8; 943 nodes, 204 operators |
 | Oracle external activation | Nakamoto >= 6 reached; gated on Phase 3 completion |
 | Quorum size | 12 seats per round |
 | Quorum dedup, HF22 | One operator wallet address per quorum seat per round |
 | Quorum dedup, HF23 | One proximity cluster per quorum seat per round (requires Lokinet) |
 | Quorum dedup fallback, HF23 | If fewer than 12 distinct clusters exist, smallest clusters receive additional seats first before most concentrated clusters; fallback frequency logged and published |
-| Network survivability cap, HF23 | 30% of active nodes per proximity cluster (~208 nodes at current count) |
+| Network survivability cap, HF23 | 30% of active nodes per proximity cluster (~283 nodes at current count) |
 | Zero-reward modifier, HF23 | Zero block rewards for nodes above cluster cap, ranked by registration age |
 | Core repos | github.com/XEQMLabs |
 
@@ -272,7 +272,7 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 
 ## 9. Roadmap
 
-**Phase 1, Network stabilization. COMPLETE.** The service node network grew to 944 active service nodes as of September 27, 2026 (from 693 across 184 operators in July 2026, Nakamoto coefficient 7). XEQ to XEQM coin swap ran and closed successfully.
+**Phase 1, Network stabilization. COMPLETE.** The service node network grew to 943 active service nodes as of September 27, 2026 (from 693 across 184 operators in July 2026, Nakamoto coefficient 7). XEQ to XEQM coin swap ran and closed successfully.
 
 **Phase 2, EXIOM developer API and ARC Compliance Oracle. ACTIVE.** The ARC compliance oracle is live on mainnet with an operator committee, and the developer API is live in beta (self-serve credentials, compliance and verification endpoints, OpenAPI). Remaining Phase 2 work: prepaid consumption billing, the operator revenue share, and first production integrations. EXIOM RFQ trading platform development proceeds in parallel, XEQM/BTC as the first trading pair.
 
@@ -280,9 +280,9 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 
 **Phase 4, External oracle consumer access.** Oracle outputs available to Production and Enterprise tier developers and external consumers. Nakamoto coefficient threshold of 6 already reached; activation gated on Phase 3 completion.
 
-**HF22, entering testnet.** Two validated consensus changes with no Lokinet dependency: operator wallet-key quorum deduplication (one operator address per quorum seat per round) and unbonding period unification (forced deregistration extended from 7 to 14 days).
+**HF22, built and scheduled (mainnet block 219120, ~early October 2026).** Two validated consensus changes with no Lokinet dependency: operator wallet-key quorum deduplication (one operator address per quorum seat per round) and unbonding period unification (forced deregistration extended from 7 to 14 days). Nodes are being upgraded across the network ahead of activation.
 
-**HF23, design phase, pending Lokinet assessment.** Once Lokinet is active as the network transport: Lokinet activation as primary transport replacing publicly announced IP addresses; proximity cluster registration cap (registrations rejected when a cluster exceeds 30% of active nodes); zero-reward modifier for nodes above the cap threshold ranked by registration age; upgrade of quorum deduplication from wallet-key to proximity cluster, with a mandatory fallback rule ensuring quorum formation is always possible even when fewer than 12 distinct clusters exist (smallest clusters receive additional seats first before most concentrated clusters, with fallback frequency logged and published as a concentration risk indicator). A 30-day grace period applies at activation before the zero-reward modifier takes effect.
+**HF23, in design, targeted Q4 2026.** Once Lokinet is active as the network transport: Lokinet activation as primary transport replacing publicly announced IP addresses; proximity cluster registration cap (registrations rejected when a cluster exceeds 30% of active nodes); zero-reward modifier for nodes above the cap threshold ranked by registration age; upgrade of quorum deduplication from wallet-key to proximity cluster, with a mandatory fallback rule ensuring quorum formation is always possible even when fewer than 12 distinct clusters exist (smallest clusters receive additional seats first before most concentrated clusters, with fallback frequency logged and published as a concentration risk indicator). A 30-day grace period applies at activation before the zero-reward modifier takes effect.
 
 **Phase 6, Formal governance.** Structured proposal process, weighted voting for operators, long-term transition away from founding-team governance.
 
