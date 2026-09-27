@@ -351,7 +351,7 @@ RFQ application specification and data model are complete. Active development pr
 
 ## Available Languages
 
-Community translations of this whitepaper are maintained in the translations folder. In the event of any conflict between a translation and the English version, the English version governs.
+Community translations of this whitepaper are maintained in the translations folder for convenience. **The English version is the single authoritative document at all times.** Translations may lag behind the current English revision and are not guaranteed to be up to date; in the event of any conflict, ambiguity, or difference of any kind, the English version governs.
 
 | Language | Whitepaper |
 |---|---|
