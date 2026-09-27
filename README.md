@@ -91,12 +91,12 @@ Beyond block rewards, the platform earns revenue from developer usage. Access is
 
 Consumed XEQM is recognized as platform revenue and distributed between the operators who serve the oracle and platform operations:
 
-| Recipient | Purpose |
-|---|---|
-| Oracle sidecar operators | Service-node operators running the oracle sidecar, rewarded in proportion to the oracle duties they help serve |
-| Platform operations and development | Funds ongoing operations and development, reducing reliance on governance emission over time |
+| Recipient | Share | Purpose |
+|---|---|---|
+| Oracle sidecar operators | 70% | Service-node operators running the oracle sidecar, rewarded in proportion to the oracle duties they help serve |
+| Platform operations and development | 30% | Funds ongoing operations and development, reducing reliance on governance emission over time |
 
-The split ratio between these two is a platform parameter, published at launch and adjustable through governance. This revenue share is the mechanism by which the operator sidecar reward described in Section 4 is funded from real usage rather than emission.
+Operators take the majority because they run the infrastructure that serves the oracle. The 70/30 ratio is the initial value and is adjustable through governance. Revenue is recognized and distributed on the same weekly cadence as block rewards — each 10,080-block window (approximately 7 days), aligned to the HF21 reward batching — so an operator receives block rewards and the usage-revenue share on one rhythm. This revenue share is the mechanism by which the operator sidecar reward described in Section 4 is funded from real usage rather than emission.
 
 Baseline hardware to run a service node (and its oracle sidecar): 4 CPU cores, 8 GB RAM, 100 GB SSD, 100 Mbps connection. Heavier privacy-oracle workloads require higher specifications, covered in Section 10.
 
