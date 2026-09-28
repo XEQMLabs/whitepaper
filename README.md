@@ -14,7 +14,7 @@
 | XEQ to XEQM coin swap | Delivered and closed, 35-day production run, public auditable ledger |
 | GUI wallet | Live, github.com/XEQMLabs/XEQMLabs-GUI |
 | Node explorer | Live, active service node monitoring |
-| EXIOM ARC Compliance Oracle | Live on mainnet (Robinhood Chain, chainId 4663); 11-member operator committee as of September 27, 2026 |
+| EXIOM Oracle | Live on mainnet (Robinhood Chain, chainId 4663); 11-member operator committee as of September 27, 2026 |
 | EXIOM developer API | Live in beta — self-serve keys, signed compliance claims and a verification engine, OpenAPI at /docs; free-to-build with prepaid per-call usage rolling out (September 27, 2026) |
 | EXIOM Privacy Oracle (TLSNotary / ZK) | Foundations live (verification engine, oracle sessions); full private-web-data oracle in Phase 3 |
 | EXIOM RFQ trading platform | In development, Phase 2/3, XEQM/BTC first pair |
@@ -38,7 +38,7 @@ XEQM is a native Layer 1 coin, not tokenized on any other chain, not an ERC-20 o
 
 **EXIOM Coin Swap.** A commercial product enabling projects to migrate their holder community from a legacy chain to a new chain with full cryptographic auditability. The pilot was the migration of XEQ holders to XEQM on the EXIOM mainnet, running for 35 days with every submission processed through a cryptographically verified ledger bearing a public SHA256 fingerprint. The product is available to other projects requiring a verifiable chain migration.
 
-**EXIOM ARC Compliance Oracle.** Live on mainnet. The platform's first oracle product: a committee of XEQM service-node operators — each running a lightweight oracle sidecar — that produces BLS-aggregate, EIP-712 signed compliance attestations (for example, that an address is eligible for a given jurisdiction) which applications consume through the developer API. It is deployed on Robinhood Chain (chainId 4663) and runs an 11-member operator committee as of September 27, 2026. Running the sidecar is how a service-node operator earns additional, usage-based revenue on top of block rewards.
+**EXIOM Oracle.** Live on mainnet. The platform's first oracle product: a committee of XEQM service-node operators — each running a lightweight oracle sidecar — that produces BLS-aggregate, EIP-712 signed compliance attestations (for example, that an address is eligible for a given jurisdiction) which applications consume through the developer API. It is deployed on Robinhood Chain (chainId 4663) and runs an 11-member operator committee as of September 27, 2026. Running the sidecar is how a service-node operator earns additional, usage-based revenue on top of block rewards.
 
 **EXIOM Developer API.** Live in beta. A structured API exposing the platform's compliance and verification capabilities — signed compliance claims and a verification engine (signed-claims, TLSNotary, and zero-knowledge mechanisms) — with self-serve access (a DID plus API key), an OpenAPI 3.1 specification, webhooks, and idempotent requests. Developers build for free on a generous monthly allowance and pay for production usage in XEQM, consumed per call. Phase 2, active.
 
@@ -274,7 +274,7 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 
 **Phase 1, Network stabilization. COMPLETE.** The service node network grew to 943 active service nodes as of September 27, 2026 (from 693 across 184 operators in July 2026, Nakamoto coefficient 7). XEQ to XEQM coin swap ran and closed successfully.
 
-**Phase 2, EXIOM developer API and ARC Compliance Oracle. ACTIVE.** The ARC compliance oracle is live on mainnet with an operator committee, and the developer API is live in beta (self-serve credentials, compliance and verification endpoints, OpenAPI). Remaining Phase 2 work: prepaid consumption billing, the operator revenue share, and first production integrations. EXIOM RFQ trading platform development proceeds in parallel, XEQM/BTC as the first trading pair.
+**Phase 2, EXIOM developer API and EXIOM Oracle. ACTIVE.** The EXIOM Oracle is live on mainnet with an operator committee, and the developer API is live in beta (self-serve credentials, compliance and verification endpoints, OpenAPI). Remaining Phase 2 work: prepaid consumption billing, the operator revenue share, and first production integrations. EXIOM RFQ trading platform development proceeds in parallel, XEQM/BTC as the first trading pair.
 
 **Phase 3, EXIOM Privacy Oracle and RFQ platform.** The oracle rolls out in phases: internal proof of concept, federated testnet, then mainnet with internal consumers. The RFQ trading platform reaches production in this phase, using the oracle for private price attestation on the XEQM/BTC pair. Both are built on the EXIOM API.
 
@@ -290,9 +290,9 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 
 ## 10. EXIOM Oracle
 
-### The first live oracle: ARC Compliance Oracle
+### The first live oracle: EXIOM Oracle
 
-The platform's first oracle product is live on mainnet. The ARC Compliance Oracle is a committee of XEQM service-node operators — each running a lightweight oracle sidecar alongside their node — that collectively produce BLS-aggregate, EIP-712 signed attestations about compliance facts, most directly whether a given address is eligible for a given jurisdiction. Applications consume these attestations through the developer API and can submit the signed result on-chain. The committee is deployed on Robinhood Chain (chainId 4663) and runs an 11-member operator committee as of September 27, 2026, with a two-thirds signing threshold.
+The platform's first oracle product is live on mainnet. The EXIOM Oracle is a committee of XEQM service-node operators — each running a lightweight oracle sidecar alongside their node — that collectively produce BLS-aggregate, EIP-712 signed attestations about compliance facts, most directly whether a given address is eligible for a given jurisdiction. Applications consume these attestations through the developer API and can submit the signed result on-chain. The committee is deployed on Robinhood Chain (chainId 4663) and runs an 11-member operator committee as of September 27, 2026, with a two-thirds signing threshold.
 
 The sidecar is deliberately light: it holds only its own signing key, reads its node's identity locally, and never handles the operator's spend keys. Running it is the mechanism by which a service-node operator earns the additional, usage-funded revenue described in Sections 3 and 4.
 
