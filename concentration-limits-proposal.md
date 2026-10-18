@@ -2,6 +2,8 @@
 ## Technical Companion to the EXIOM Tokenomics Whitepaper
 ### 07/26/2026
 
+> **Scope note (updated October 2026).** The enforced unit is the *proximity cluster* (a group of nodes that share physical or routing infrastructure, detected via Lokinet routing proximity, uptime-proof timing, and ASN), **not the country**. A country with several independent facilities is unaffected. The country figures below are a coarse geographic proxy for where the concentration currently sits, not the thing the protocol caps. Node counts in this companion are a July 2026 snapshot (~672 nodes); see the whitepaper for current network totals (943 nodes as of September 27, 2026). Lokinet ships in a non-enforcing release before HF23, and HF23 flips enforcement.
+
 This document is a companion to the EXIOM Tokenomics Whitepaper and assumes it has been read. The whitepaper covers what the concentration controls are and why they exist. This document covers the mechanical detail of how each control works, the testnet validation data behind HF22, the precise economic math behind the zero-reward modifier, the operator identity question on a privacy chain, and the residual risks the protocol does not fully solve.
 
 ---
@@ -22,7 +24,7 @@ This document is a companion to the EXIOM Tokenomics Whitepaper and assumes it h
 | Lithuania | 2 |
 | Serbia | 1 |
 
-France at approximately 71% of the network is almost entirely one Contabo facility in Grand Est. The survivability threshold established in the whitepaper is 30% of active nodes per cluster, approximately 208 nodes at current count. Grand Est at 426 nodes is more than double that threshold.
+France holds 492 of the 672 nodes in this snapshot (about 73% of the network), and that concentration is almost entirely a single Contabo facility in Grand Est holding roughly 426 nodes (about 63% of the network). The country total is not what the protocol caps; the Grand Est **cluster** is. The survivability threshold is 30% of active nodes per proximity cluster (about 202 nodes at this snapshot's 672, and about 283 at the 943 nodes in the current whitepaper), recalculated continuously as the network grows. Grand Est at roughly 426 nodes is more than double that cap.
 
 ---
 
@@ -30,17 +32,17 @@ France at approximately 71% of the network is almost entirely one Contabo facili
 
 This section answers the question directly: how does HF23 affect how you run your nodes?
 
-**HF23 does not require one node per IP, one node per VPS, or one node per wallet.** The cap is 30% of the active network per proximity cluster, currently approximately 208 nodes. An operator running 10, 50, or even 100 nodes on shared infrastructure is completely unaffected by HF23 as long as their cluster stays below that threshold. You can run multiple nodes on one machine, one VPS account, and one wallet. Nothing in HF23 changes that.
+**HF23 does not cap by country, and does not require one node per IP, one node per VPS, or one node per wallet.** The cap is 30% of the active network per *proximity cluster* (nodes that share physical or routing infrastructure). An operator running 10, 50, or even 100 nodes on shared infrastructure is completely unaffected by HF23 as long as their cluster stays below that threshold. You can run multiple nodes on one machine, one VPS account, and one wallet. Nothing in HF23 changes that.
 
-**The zero-reward modifier applies only to nodes above the 208-node cluster threshold.** The oldest registered nodes in a cluster earn full rewards up to that threshold. Only nodes ranked above it in an over-concentrated cluster earn zero, and only until they are migrated to a less concentrated cluster.
+**The zero-reward modifier applies only to nodes above the per-cluster cap (30% of active nodes).** The oldest registered nodes in a cluster earn full rewards up to that threshold. Only nodes ranked above it in an over-concentrated cluster earn zero, and only until they are migrated to a less concentrated cluster.
 
 **The quorum deduplication caps consensus influence per round, not node count or income.** An operator running 50 nodes on one VPS earns block rewards on all 50 and manages their infrastructure exactly as they do today. They receive one quorum seat per cluster per round instead of potentially many, which is the intended outcome.
 
-**The right approach for a new operator** is to check the node explorer, see where existing clusters are concentrated, and deploy into a lightly populated region. Ten nodes on one server in Brazil or Argentina works perfectly fine under HF23 because those regions are nowhere near the 30% threshold. Full rewards, full quorum participation, no issues.
+**The right approach for a new operator** is to check the node explorer, see where existing clusters are concentrated, and deploy into a lightly populated cluster. Ten nodes on one server with its own distinct routing works perfectly fine under HF23 because that cluster is nowhere near the 30% threshold. Full rewards, full quorum participation, no issues.
 
 **The dynamic works in your favor if you deploy into sparse regions.** If a region eventually fills up, the node explorer shows it and operators have a financial incentive to move before the cap affects them. Operators who got there first keep full rewards on their oldest nodes up to the threshold. New registrations into an over-concentrated cluster earn nothing immediately, so the economics naturally push new deployments toward lighter regions.
 
-**The specific problem HF23 solves** is one facility in France currently hosting approximately 426 nodes, 61% of the network. If that facility goes offline the network stalls. The goal is getting that cluster below 208 nodes. Every other operator running a responsible multi-node setup in a non-concentrated region is exactly what the network needs more of.
+**The specific problem HF23 solves** is one facility in France (the Grand Est Contabo cluster) hosting roughly 426 nodes, about 63% of the network in this snapshot. If that facility goes offline the network stalls. The goal is getting that cluster below the 30% cap. Every other operator running a responsible multi-node setup in a non-concentrated cluster is exactly what the network needs more of.
 
 ---
 
@@ -48,7 +50,7 @@ This section answers the question directly: how does HF23 affect how you run you
 
 HF22 ships after successful testing. Wallet-key quorum deduplication and unbonding period unification have no dependency on Lokinet. Both have been validated on testnet and holding them while the Lokinet assessment is pending is unjustified delay. A sophisticated actor who reads the whitepaper before HF22 ships could attempt wallet splitting to pre-empt the quorum control, but doing so is detectable through uptime proof timing correlation and IP/ASN analysis and creates a documented record for governance action.
 
-HF23 ships after the Lokinet engineering assessment completes. If the assessment returns a configuration-change-only result, HF23 can follow HF22 quickly. If it returns a significant engineering effort, Grand Est stays exposed to the full survivability risk beyond quorum dedup until HF23 is ready. Separating the releases also gives clean failure domains: if something goes wrong post-HF23 activation there are fewer variables to isolate.
+Lokinet ships first in its own non-enforcing release (alongside the SQLite light-node storage change), so the new transport is not made consensus-critical the moment it is introduced. During that release the proximity clustering runs live and observable with no reward consequences, which is when the real cluster count is measured and the HF23 threshold and fallback are tuned. HF23 then follows and flips enforcement on. Separating the releases also gives clean failure domains: if something goes wrong post-HF23 activation there are fewer variables to isolate. Until HF23 enforcement is live, Grand Est stays exposed to the full survivability risk beyond the HF22 quorum dedup.
 
 ---
 
@@ -61,9 +63,9 @@ The quorum selection algorithm runs a deduplication pass over each candidate set
 The replacement draw does not cycle back through already-rejected candidates. It draws from the remaining unselected pool in the same probability-weighted order used for the initial draw. This preserves the statistical properties of the quorum selection without introducing a deterministic bias toward any particular set of remaining nodes.
 
 **Testnet validation results:**
-- Nine stall/recovery cycles completed
+- 20 stall/recovery cycles completed (20/20)
 - 100% recovery rate across all cycles
-- Zero manual intervention required in any cycle
+- Zero manual intervention required in any cycle (worst block gap 83 seconds)
 - Mainnet pre-HF22 baseline: 1,000 blocks, 100% Pulse, zero GOV_SIGNED blocks
 - R0 timeout analysis: no R0 timeouts introduced in production conditions. Density analysis of current mainnet confirms every high-density IP cluster is a single operator, meaning wallet-key dedup already provides full protection against the current whale deployments. The two largest single-IP deployments (58 nodes and 51 nodes respectively) are each one operator and are capped at one quorum seat per round under HF22.
 
@@ -157,9 +159,11 @@ For survivability enforcement, this does not matter. The cluster contains 426 no
 
 | Control | Status |
 |---|---|
-| Operator wallet-key quorum dedup | HF22, entering testnet, validated |
-| Unbonding period unification, 7 to 14 days | HF22, entering testnet |
-| Lokinet activation as network transport | Engineering assessment underway |
+| Operator wallet-key quorum dedup | HF22, activated at block 219120 |
+| Unbonding period unification, 7 to 14 days | HF22, activated |
+| Pulse stall-recovery (signature fallback, snode_revision 1) | Activated at block 236920, October 18, 2026 |
+| Lokinet activation as network transport | In development; ships in a non-enforcing release before HF23 |
+| SQLite light-node storage | In development; ships with the pre-HF23 Lokinet release |
 | Proximity clustering algorithm | Design phase, pending Lokinet assessment |
 | Cluster registration cap, 30% threshold | HF23, design phase |
 | Zero-reward modifier for excess nodes | HF23, design phase |

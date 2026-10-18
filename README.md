@@ -10,7 +10,8 @@
 |---|---|
 | EXIOM mainnet | Live, operational since May 6, 2026 |
 | Service node network | Live — 943 active service nodes as of September 27, 2026 |
-| Lokinet (LLARP) | Committed as HF23's network transport; implementation begins Q4 2026 |
+| Lokinet (LLARP) | Ships in a non-enforcing release before HF23 (transport live, proximity clustering observable); HF23 flips enforcement. Implementation begins Q4 2026 |
+| SQLite light-node storage | In development; ships with the pre-HF23 Lokinet release, for lower node memory and disk, with optional recent-window light nodes |
 | XEQ to XEQM coin swap | Delivered and closed, 35-day production run, public auditable ledger |
 | GUI wallet | Live, github.com/XEQMLabs/XEQMLabs-GUI |
 | Node explorer | Live, active service node monitoring |
@@ -18,8 +19,8 @@
 | EXIOM developer API | Live in beta — self-serve keys, signed compliance claims and a verification engine, OpenAPI at /docs; free-to-build with prepaid per-call usage rolling out (September 27, 2026) |
 | EXIOM Privacy Oracle (TLSNotary / ZK) | Foundations live (verification engine, oracle sessions); full private-web-data oracle in Phase 3 |
 | EXIOM RFQ trading platform | In development, Phase 2/3, XEQM/BTC first pair |
-| HF22, wallet-key quorum dedup and unbonding unification | Built and validated; scheduled to activate at mainnet block 219120 (~early October 2026) |
-| HF23, proximity cluster cap, reward modifier, Lokinet transport | In design; Lokinet transport committed; targeted Q4 2026 |
+| HF22, wallet-key quorum dedup, unbonding unification, Pulse stall-recovery | Activated at mainnet block 219120. The Pulse stall-recovery revision (snode_revision 1, signature-based fallback) activated at block 236920 on October 18, 2026 |
+| HF23, proximity cluster cap and reward modifier (enforcement) | In design; flips on the concentration limits once the non-enforcing Lokinet + light-node release has soaked; targeted Q4 2026 |
 | Formal on-chain governance | Planned, Phase 6 |
 
 ---
@@ -145,9 +146,9 @@ At 943 nodes (September 27, 2026), 30% is approximately 283 nodes. Losing any si
 
 Survivability enforcement is delivered in two stages, separated to reduce risk and ship validated work immediately.
 
-**HF22, built and scheduled:** Operator wallet-key quorum deduplication and unbonding period unification. No Lokinet dependency. Validated through nine stall/recovery cycles with 100% recovery rate and zero intervention, and scheduled to activate at mainnet block 219120 (approximately early October 2026); nodes are being upgraded ahead of activation.
+**HF22, activated:** Operator wallet-key quorum deduplication and unbonding period unification, plus a Pulse stall-recovery revision (snode_revision 1) that replaces the earlier Proof-of-Work recovery fallback with a signature-based one. No Lokinet dependency. Validated through 20 stall/recovery cycles with a 100% recovery rate, zero intervention, and a worst block gap of 83 seconds. HF22 activated at mainnet block 219120; the stall-recovery revision activated at block 236920 on October 18, 2026.
 
-**HF23, in design, targeted Q4 2026:** Proximity cluster registration cap, zero-reward modifier for excess nodes, and upgrade of quorum deduplication from wallet-key to proximity cluster. All three depend on Lokinet as the primary network transport, which is a committed part of HF23. Implementation begins in Q4 2026.
+**HF23, in design, targeted Q4 2026:** Proximity cluster registration cap, zero-reward modifier for excess nodes, and upgrade of quorum deduplication from wallet-key to proximity cluster. All three rely on the Lokinet routing graph as the proximity signal. To avoid making a new transport consensus-critical the moment it is introduced, Lokinet ships first in a separate non-enforcing release (alongside the SQLite light-node storage change), where the proximity clustering is live and observable but has no reward consequences. HF23 then flips enforcement on, after that release has soaked and the real cluster count has been measured and the threshold and fallback tuned.
 
 ### HF22 Controls
 
@@ -189,7 +190,7 @@ The full concentration limits proposal is at [concentration-limits-proposal.md](
 
 ### Lokinet as the Future Network Transport
 
-The EXIOM network's addressing infrastructure will migrate from publicly announced IP addresses to Lokinet addressing as part of HF23 (targeted Q4 2026). Lokinet (Low Latency Anonymous Routing Protocol, LLARP) is a layer 3 onion routing protocol routing any IP-based traffic through multiple service nodes via multi-hop onion routing, with no single node in the path knowing both the origin and destination.
+The EXIOM network's addressing infrastructure will migrate from publicly announced IP addresses to Lokinet addressing. Lokinet ships first in a non-enforcing release before HF23 (targeted Q4 2026); HF23 then adds the concentration enforcement that uses the Lokinet routing graph. Lokinet (Low Latency Anonymous Routing Protocol, LLARP) is a layer 3 onion routing protocol routing any IP-based traffic through multiple service nodes via multi-hop onion routing, with no single node in the path knowing both the origin and destination.
 
 Once Lokinet is active:
 
@@ -198,7 +199,7 @@ Once Lokinet is active:
 - The RFQ trading platform will be accessible as a hidden service, concealing requester and LP IP addresses from the platform
 - Oracle session communication between prover and verifier quorum will be routed over Lokinet, eliminating the centralized coordinator trust assumption
 
-Lokinet is a committed part of HF23, targeted for Q4 2026. The LLARP codebase is present in the EXIOM repository; implementation of Lokinet as the primary network transport begins in Q4 2026.
+Lokinet ships in a non-enforcing release ahead of HF23, targeted for Q4 2026, with HF23 following once it has soaked. The LLARP codebase is present in the EXIOM repository; implementation of Lokinet as the primary network transport begins in Q4 2026.
 
 ---
 
@@ -280,9 +281,11 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 
 **Phase 4, External oracle consumer access.** Oracle outputs available to Production and Enterprise tier developers and external consumers. Nakamoto coefficient threshold of 6 already reached; activation gated on Phase 3 completion.
 
-**HF22, built and scheduled (mainnet block 219120, ~early October 2026).** Two validated consensus changes with no Lokinet dependency: operator wallet-key quorum deduplication (one operator address per quorum seat per round) and unbonding period unification (forced deregistration extended from 7 to 14 days). Nodes are being upgraded across the network ahead of activation.
+**HF22, activated (mainnet block 219120).** Two consensus changes with no Lokinet dependency, operator wallet-key quorum deduplication (one operator address per quorum seat per round) and unbonding period unification (forced deregistration extended from 7 to 14 days), plus a Pulse stall-recovery revision (snode_revision 1) that activated at block 236920 on October 18, 2026, replacing Proof-of-Work recovery with a signature-based fallback. Validated across 20 stall/recovery cycles (100% recovery, worst block gap 83 seconds).
 
-**HF23, in design, targeted Q4 2026.** Once Lokinet is active as the network transport: Lokinet activation as primary transport replacing publicly announced IP addresses; proximity cluster registration cap (registrations rejected when a cluster exceeds 30% of active nodes); zero-reward modifier for nodes above the cap threshold ranked by registration age; upgrade of quorum deduplication from wallet-key to proximity cluster, with a mandatory fallback rule ensuring quorum formation is always possible even when fewer than 12 distinct clusters exist (smallest clusters receive additional seats first before most concentrated clusters, with fallback frequency logged and published as a concentration risk indicator). A 30-day grace period applies at activation before the zero-reward modifier takes effect.
+**Lokinet and light-node release, before HF23.** A non-enforcing release that brings Lokinet online as the network transport (proximity clustering live and observable in the node explorer, with no reward consequences) and introduces SQLite light-node storage (lower per-node memory and disk, with optional recent-window light nodes). This release soaks so the real proximity-cluster count can be measured and the HF23 threshold and fallback tuned before any enforcement takes effect.
+
+**HF23, in design, targeted Q4 2026.** Flips on enforcement once the non-enforcing Lokinet and light-node release above has soaked: proximity cluster registration cap (registrations rejected when a cluster exceeds 30% of active nodes); zero-reward modifier for nodes above the cap threshold ranked by registration age; upgrade of quorum deduplication from wallet-key to proximity cluster, with a mandatory fallback rule ensuring quorum formation is always possible even when fewer than 12 distinct clusters exist (smallest clusters receive additional seats first before most concentrated clusters, with fallback frequency logged and published as a concentration risk indicator). A 30-day grace period applies at activation before the zero-reward modifier takes effect.
 
 **Phase 6, Formal governance.** Structured proposal process, weighted voting for operators, long-term transition away from founding-team governance.
 

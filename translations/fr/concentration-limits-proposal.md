@@ -1,3 +1,5 @@
+> ⚠️ **Out of date.** This translation predates the October 2026 English revision (Lokinet-before-HF23 sequencing, SQLite light-node release, HF22/rev1 activation, and the proximity-cluster-not-country framing). The English version governs until this is re-synced.
+
 # Limites de Concentration des Nœuds - Application de la Résilience du Réseau
 ## Document Technique Complémentaire au Livre Blanc de Tokenomie EXIOM
 ### 26/07/2026
