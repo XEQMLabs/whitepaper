@@ -1,3 +1,5 @@
+> ⚠️ **Out of date.** This translation predates the October 2026 English revision (Lokinet-before-HF23 sequencing, SQLite light-node release, HF22/rev1 activation, and the proximity-cluster-not-country framing). The English version governs until this is re-synced.
+
 # Knotenkonzentrationslimits - Netzwerk-Überlebensfähigkeit
 ## Technisches Begleitdokument zum EXIOM Tokenomics Whitepaper
 ### 26.07.2026

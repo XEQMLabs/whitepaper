@@ -2,6 +2,8 @@
 ## Technical Companion to the EXIOM Tokenomics Whitepaper
 ### 07/26/2026
 
+> **Note (updated October 2026).** Concentration is enforced per *proximity cluster* (shared physical or routing infrastructure), **not per country**. Node figures here are a July 2026 snapshot; see the whitepaper for current totals. Lokinet ships in a non-enforcing release before HF23, and HF23 flips enforcement.
+
 This document is a companion to the EXIOM Tokenomics Whitepaper and the Node Concentration Limits proposal, and assumes both have been read. The whitepaper covers what the controls are. The concentration-limits-proposal covers the mechanics of how each control works. This document covers the threat model: what a Sybil attack actually looks like on a privacy chain, what makes EXIOM's architecture specifically resistant or vulnerable, and how the ongoing monitoring methodology identifies concentration in practice.
 
 ---
@@ -42,7 +44,7 @@ Because transaction-level analysis is unavailable, EXIOM's concentration detecti
 
 This signal is specifically useful for identifying wallet-splitting operators who keep their nodes on shared infrastructure. The wallet keys differ; the proof timing does not.
 
-**Lokinet routing proximity (HF23, pending assessment).** Once Lokinet is active as the network transport, the routing graph provides a continuous physical topology map of the node network. Nodes at the same facility route through the same upstream infrastructure, producing correlated path selections and sub-millisecond inter-node latency regardless of their wallet keys or announced IP addresses. This is the most robust signal because it reflects physical network reality that cannot be changed by software configuration without actually moving infrastructure.
+**Lokinet routing proximity (ships non-enforcing before HF23; enforced at HF23).** Once Lokinet is active as the network transport, the routing graph provides a continuous physical topology map of the node network. Nodes at the same facility route through the same upstream infrastructure, producing correlated path selections and sub-millisecond inter-node latency regardless of their wallet keys or announced IP addresses. This is the most robust signal because it reflects physical network reality that cannot be changed by software configuration without actually moving infrastructure.
 
 ---
 
