@@ -1,79 +1,79 @@
-> ⚠️ **Out of date.** This translation predates the October 2026 English revision (Lokinet-before-HF23 sequencing, SQLite light-node release, HF22/rev1 activation, and the proximity-cluster-not-country framing). The English version governs until this is re-synced.
-
 # Risiko Sybil dan Model Mitigasi EXIOM
 ## Pendamping Teknis untuk Whitepaper Tokenomics EXIOM
-### 26/07/2026
+### 07/26/2026
 
-Dokumen ini merupakan pendamping untuk Whitepaper Tokenomics EXIOM dan proposal Batasan Konsentrasi Node, serta mengasumsikan bahwa keduanya telah dibaca. Whitepaper tersebut mencakup apa saja kontrolnya. Proposal batasan konsentrasi mencakup mekanika cara kerja setiap kontrol. Dokumen ini mencakup model ancaman: seperti apa serangan Sybil sebenarnya pada rantai privasi, apa yang membuat arsitektur EXIOM secara khusus resisten atau rentan, dan bagaimana metodologi pemantauan berkelanjutan mengidentifikasi konsentrasi dalam praktiknya.
+> **Catatan (diperbarui Oktober 2026).** Konsentrasi ditegakkan per *cluster kedekatan* (infrastruktur fisik atau routing bersama), **bukan per negara**. Angka node di sini adalah snapshot Juli 2026; lihat whitepaper untuk total saat ini. Lokinet dirilis dalam rilis non-penegakan sebelum HF23, dan HF23 mengaktifkan penegakan.
 
----
-
-## Ancaman Sybil pada Rantai Privasi
-
-Serangan Sybil pada jaringan node layanan berarti satu aktor yang mengoperasikan banyak node di bawah identitas yang tampak berbeda untuk memperoleh pengaruh yang tidak proporsional. Pada blockchain yang transparan, analisis grafik dompet sering kali dapat mengidentifikasi bahwa beberapa alamat operator node didanai dari sumber yang sama, sehingga mengungkap serangan Sybil tersebut. Pada rantai privasi, alat tersebut tidak tersedia secara desain. Jaminan privasi yang melindungi transaksi pengguna juga menghilangkan metode deteksi Sybil yang paling umum.
-
-Oleh karena itu, area serangan Sybil pada EXIOM berbeda dari rantai transparan dalam hal tertentu: seorang operator yang menggunakan fitur privasi secara benar dapat menyajikan beberapa alamat dompet yang tampak tidak saling berhubungan pada tingkat protokol, terlepas dari seberapa besar modal yang mereka kuasai. Ini bukanlah cacat dalam desain privasi. Ini adalah sifat bawaan dari setiap rantai privasi yang harus ditangani melalui mekanisme selain analisis grafik transaksi.
-
-Dua area serangan Sybil pada EXIOM berbeda dan memerlukan kontrol yang terpisah:
-
-**Serangan pengaruh konsensus.** Seorang operator mengumpulkan cukup banyak node, melalui struktur dompet apa pun, untuk memegang sejumlah kursi kuorum yang tidak proporsional secara bersamaan. Hal ini memungkinkan mereka untuk memengaruhi hasil sesi oracle, putaran Pulse, dan kuorum kewajiban di luar apa yang dianggap adil oleh proporsi stake individu mereka. Kerusakan terjadi pada integritas konsensus, tidak selalu pada waktu aktif pada jaringan.
-
-**Serangan kegagalan domain.** Seorang operator mengonsentrasikan node dalam satu fasilitas fisik. Hal ini bisa jadi disengaja sebagai serangan atau tidak disengaja; ini bisa dihasilkan dari optimasi biaya. Kerusakan terjadi pada kelangsungan hidup jaringan: satu pemadaman fasilitas membawa node operator offline secara bersamaan, berpotensi menghentikan produksi blok jika konsentrasinya cukup besar.
+Dokumen ini adalah pendamping untuk Whitepaper Tokenomics EXIOM dan proposal Batas Konsentrasi Node, dan mengasumsikan keduanya telah dibaca. Whitepaper mencakup apa kontrol itu. Concentration-limits-proposal mencakup mekanika tentang bagaimana setiap kontrol bekerja. Dokumen ini mencakup model ancaman: seperti apa serangan Sybil sebenarnya pada chain privasi, apa yang membuat arsitektur EXIOM secara spesifik tahan atau rentan, dan bagaimana metodologi pemantauan berkelanjutan mengidentifikasi konsentrasi dalam praktik.
 
 ---
 
-## Apa yang Membuat EXIOM Secara Struktural Resisten
+## Ancaman Sybil pada Chain Privasi
 
-**Biaya modal per identitas.** Tidak seperti serangan Sybil murni di mana identitas bisa didapatkan secara gratis, setiap node layanan EXIOM membutuhkan 200.000 XEQM yang distake, dengan operator secara pribadi men-stake setidaknya 100.000 XEQM. Seorang operator yang menjalankan 100 node memiliki 10.000.000 XEQM modal yang distake dan terkunci. Membuat identitas tambahan yang tampak baru melalui pemisahan dompet tidak mengurangi biaya ini -- setiap node tetap membutuhkan 100.000 XEQM stake dari operator. Serangan Sybil sangat mahal di setiap skala.
+Serangan Sybil pada jaringan service node berarti satu aktor mengoperasikan banyak node di bawah identitas tampak yang berbeda untuk memperoleh pengaruh yang tidak proporsional. Pada blockchain transparan, analisis grafik wallet sering kali dapat mengungkapkan bahwa beberapa alamat operator node didanai dari sumber yang sama, mengekspos Sybil. Pada chain privasi, perkakas itu tidak tersedia secara desain. Jaminan privasi yang melindungi transaksi pengguna juga menghapus metode deteksi Sybil yang paling umum.
 
-**Gesekan unbonding.** Periode unbonding selama 14 hari untuk penarikan sukarela maupun pendaftaran ulang paksa berarti modal yang ditaruh pada node Sybil tidak dapat diekstraksi dengan cepat. Penyerang yang memutuskan untuk keluar tidak dapat melakukannya lebih cepat daripada operator lain.
+Oleh karena itu permukaan Sybil EXIOM berbeda dari chain transparan dengan cara yang spesifik: operator yang menggunakan fitur privasi dengan benar dapat menyajikan beberapa alamat wallet yang tampak tidak berhubungan pada tingkat protokol, terlepas dari seberapa banyak modal yang mereka kendalikan. Ini bukan cacat dalam desain privasi. Ini adalah properti inheren dari setiap chain privasi yang harus diatasi melalui mekanisme selain analisis grafik transaksi.
 
-**Pendaftaran node publik.** Setiap kunci pendaftaran node layanan dan alamat dompet operator bersifat publik. Sebuah node tidak dapat berpartisipasi dalam konsensus secara anonim. Meskipun identitas manusia di balik alamat dompet bersifat privat, sidik jari operasional node terakumulasi dari waktu ke waktu melalui pola pendaftaran, bukti waktu aktif, dan perilaku perutean.
+Dua permukaan serangan Sybil pada EXIOM berbeda dan memerlukan kontrol terpisah:
+
+**Serangan pengaruh konsensus.** Operator mengakumulasi cukup node, melalui struktur wallet apa pun, untuk memegang jumlah kursi kuorum yang tidak proporsional secara bersamaan. Ini memungkinkan mereka memengaruhi hasil sesi oracle, ronde Pulse, dan kuorum kewajiban melebihi apa yang proporsi stake individual mereka sarankan sebagai adil. Kerusakannya adalah pada integritas konsensus, tidak harus pada uptime jaringan.
+
+**Serangan failure domain.** Operator mengonsentrasikan node di satu fasilitas fisik. Ini mungkin atau mungkin tidak disengaja sebagai serangan; itu dapat dihasilkan dari optimisasi biaya. Kerusakannya adalah pada daya tahan jaringan: satu pemadaman fasilitas membawa node operator offline secara bersamaan, berpotensi memacetkan produksi blok jika konsentrasinya cukup besar.
+
+---
+
+## Apa yang Membuat EXIOM Tahan Secara Struktural
+
+**Biaya modal per identitas.** Tidak seperti serangan Sybil murni di mana identitas gratis, setiap service node EXIOM memerlukan 200,000 XEQM yang di-stake, dengan operator secara pribadi men-stake setidaknya 100,000 XEQM. Operator yang menjalankan 100 node memiliki 10,000,000 XEQM modal yang di-stake dan terkunci. Menciptakan identitas tampak tambahan melalui pemecahan wallet tidak mengurangi biaya ini -- setiap node masih memerlukan 100,000 XEQM stake operator. Serangan Sybil mahal pada setiap skala.
+
+**Friksi unbonding.** Periode unbonding 14-hari pada baik penarikan sukarela maupun deregistrasi paksa berarti modal yang dikomitmenkan ke node Sybil tidak dapat diekstraksi dengan cepat. Penyerang yang memutuskan untuk keluar tidak dapat melakukannya lebih cepat dari operator lain mana pun.
+
+**Registri node publik.** Kunci registrasi dan alamat wallet operator setiap service node bersifat publik. Sebuah node tidak dapat berpartisipasi dalam konsensus secara anonim. Meskipun identitas manusia di balik alamat wallet bersifat privat, sidik jari operasional node terakumulasi dari waktu ke waktu melalui pola registrasi, timing bukti uptime, dan perilaku routing.
 
 ---
 
 ## Bagaimana Konsentrasi Diidentifikasi Tanpa Analisis Grafik Transaksi
 
-Karena analisis tingkat transaksi tidak tersedia, deteksi konsentrasi EXIOM bergantung pada empat sinyal yang dapat diamati dari perilaku node alih-alih riwayat pendanaan.
+Karena analisis tingkat-transaksi tidak tersedia, deteksi konsentrasi EXIOM mengandalkan empat sinyal yang dapat diamati dari perilaku node alih-alih riwayat pendanaan.
 
-**Pengklusteran kunci pendaftaran.** Node yang terdaftar di bawah kunci dompet operator yang sama secara pasti merupakan operator yang sama. Ini bersifat deterministik dari data on-chain. Operator besar yang tidak melakukan pemisahan dompet terlihat sepenuhnya melalui sinyal ini saja. Penerapan terbesar saat ini di jaringan, termasuk node yang menjalankan masing-masing 58 dan 51 node dari alamat IP tunggal, masing-masing merupakan operator tunggal yang dikonfirmasi melalui analisis kunci pendaftaran.
+**Pengelompokan kunci registrasi.** Node yang terdaftar di bawah kunci wallet operator yang sama secara definitif adalah operator yang sama. Ini deterministik dari data on-chain. Operator besar yang tidak memecah-wallet sepenuhnya terlihat melalui sinyal ini saja. Deployment terbesar saat ini pada jaringan, termasuk node yang masing-masing menjalankan 58 dan 51 node dari alamat IP tunggal, masing-masing adalah operator tunggal yang dikonfirmasi melalui analisis kunci registrasi.
 
-**Pengklusteran alamat IP dan subnet.** Saat ini merupakan sinyal ko-lokasi fisik utama. Beberapa node dari alamat IP yang sama hampir pasti berada pada server yang sama. Beberapa node dari subnet yang sama menunjukkan akun hosting atau blok pusat data yang sama. Sinyal ini tersedia hari ini tanpa perubahan daemon apa pun dan akan tetap ada sebagai sinyal tambahan setelah aktivasi Lokinet.
+**Pengelompokan alamat IP dan subnet.** Saat ini sinyal kolokasi fisik utama. Beberapa node dari alamat IP yang sama hampir pasti berada pada server yang sama. Beberapa node dari subnet yang sama menyarankan akun hosting atau blok datacenter yang sama. Sinyal ini tersedia hari ini tanpa perubahan daemon apa pun dan akan tetap ada sebagai sinyal suplemental setelah aktivasi Lokinet.
 
-**Korelasi waktu bukti waktu aktif.** Jaringan menerima bukti waktu aktif dari setiap node aktif secara teratur. Distribusi stempel waktu (timestamp) dari kedatangan bukti-bukti ini dicatat oleh node penerima. Node yang berjalan pada host fisik atau VM hypervisor yang sama mengirimkan bukti dalam jendela ketat yang khas, biasanya di bawah 10 milidetik, karena mereka berbagi jam sistem dan antarmuka jaringan yang sama. Kluster node dari kunci dompet yang berbeda yang buktinya secara konsisten tiba dalam jendela ini adalah sinyal kuat dari infrastruktur fisik yang berbagi, dapat dideteksi tanpa perubahan daemon dan tanpa Lokinet aktif.
+**Korelasi timing bukti uptime.** Jaringan menerima bukti uptime dari setiap node aktif pada jadwal reguler. Distribusi timestamp kedatangan bukti ini dicatat oleh node penerima. Node yang berjalan pada host fisik atau hypervisor VM yang sama mengirimkan bukti dalam jendela rapat yang khas, biasanya di bawah 10 milidetik, karena mereka berbagi jam sistem dan antarmuka jaringan yang sama. Cluster node dari kunci wallet berbeda yang buktinya secara konsisten tiba dalam jendela ini adalah sinyal kuat infrastruktur fisik bersama, dapat dideteksi tanpa perubahan daemon apa pun dan tanpa Lokinet aktif.
 
-Sinyal ini secara khusus berguna untuk mengidentifikasi operator pemisah dompet yang mempertahankan node mereka pada infrastruktur berbagi. Kunci dompetnya berbeda; waktu buktinya tidak.
+Sinyal ini secara spesifik berguna untuk mengidentifikasi operator pemecah-wallet yang menjaga node mereka pada infrastruktur bersama. Kunci wallet berbeda; timing bukti tidak.
 
-**Kedekatan perutean Lokinet (HF23, menunggu penilaian).** Setelah Lokinet aktif sebagai transport jaringan, grafik perutean menyediakan peta topologi fisik yang berkelanjutan dari jaringan node. Node pada fasilitas yang sama merute melalui infrastruktur upstream yang sama, menghasilkan pilihan jalur yang berkorelasi dan latensi antar-node sub-milidetik terlepas dari kunci dompet atau alamat IP yang diumumkan. Ini adalah sinyal yang paling kuat karena mencerminkan realitas jaringan fisik yang tidak dapat diubah oleh konfigurasi perangkat lunak tanpa benar-benar memindahkan infrastruktur.
+**Kedekatan routing Lokinet (dirilis non-penegakan sebelum HF23; ditegakkan di HF23).** Begitu Lokinet aktif sebagai transport jaringan, routing graph menyediakan peta topologi fisik berkelanjutan dari jaringan node. Node di fasilitas yang sama merutekan melalui infrastruktur upstream yang sama, menghasilkan pemilihan jalur berkorelasi dan latensi antar-node sub-milidetik terlepas dari kunci wallet atau alamat IP yang diumumkan mereka. Ini adalah sinyal paling kuat karena mencerminkan realitas jaringan fisik yang tidak dapat diubah oleh konfigurasi perangkat lunak tanpa benar-benar memindahkan infrastruktur.
 
 ---
 
-## Rincian Serangan Pemisahan Dompet
+## Serangan Pemecahan-Wallet Secara Detail
 
-Pendekatan Sybil paling canggih yang tersedia di EXIOM adalah pemisahan dompet: mendaftarkan node di bawah beberapa alamat dompet yang didanai melalui lapisan transaksi rantai privasi sehingga sumber pendanaan bersama tidak terlihat. Ini mengalahkan sinyal pengklusteran kunci pendaftaran tetapi tidak mengalahkan sinyal lainnya.
+Pendekatan Sybil paling canggih yang tersedia pada EXIOM adalah pemecahan wallet: meregistrasi node di bawah beberapa alamat wallet yang didanai melalui lapisan transaksi chain privasi sehingga sumber pendanaan bersama tidak terlihat. Ini mengalahkan sinyal pengelompokan kunci registrasi tetapi tidak yang lain.
 
-Seorang operator yang menjalankan 426 node di 10 dompet, semuanya dihosting di fasilitas Contabo yang sama, terungkap oleh:
+Operator yang menjalankan 426 node di seluruh 10 wallet, semuanya di-host di fasilitas Contabo yang sama, terekspos oleh:
 
-- Waktu bukti waktu aktif: bukti dari seluruh 426 node tiba dalam jendela sub-10ms khas infrastruktur berbagi
-- Analisis IP dan subnet: bahkan dengan beberapa IP, penetapan blok pusat data dan ASN tetap dibagikan
-- Kedekatan Lokinet (pasca-HF23): seluruh 426 node merute melalui backbone Contabo yang sama terlepas dari kunci dompet
+- Timing bukti uptime: bukti dari semua 426 node tiba dalam jendela sub-10ms khas infrastruktur bersama
+- Analisis IP dan subnet: bahkan dengan beberapa IP, penetapan blok datacenter dan ASN dibagikan
+- Kedekatan Lokinet (pasca-HF23): semua 426 node merutekan melalui backbone Contabo yang sama terlepas dari kunci wallet
 
-Seorang operator yang menjalankan 426 node di 10 dompet, yang benar-benar didistribusikan di 10 penyedia berbeda di 10 negara berbeda, tidak terungkap secara signifikan oleh sinyal mana pun saat ini. Kunci pendaftarannya berbeda, waktu buktinya berbeda karena infrastrukturnya berbeda, ASN-nya berbeda, dan jalur Lokinet-nya berbeda. Pada tingkat protokol, ini terlihat seperti 10 operator berbeda.
+Operator yang menjalankan 426 node di seluruh 10 wallet, benar-benar terdistribusi di seluruh 10 penyedia berbeda di 10 negara berbeda, tidak terekspos secara bermakna oleh sinyal apa pun saat ini. Kunci registrasi berbeda, timing bukti berbeda karena infrastruktur berbeda, ASN berbeda, dan jalur Lokinet berbeda. Pada tingkat protokol, ini terlihat seperti 10 operator berbeda.
 
-Ini adalah risiko Sybil yang tersisa pada EXIOM setelah semua kontrol diterapkan. Risiko ini dibatasi dalam konsekuensinya: deduplikasi kuorum HF23 membatasi setiap kluster kedekatan hingga satu kursi kuorum per putaran terlepas dari struktur dompet, sehingga operator pemisah dompet yang terdistribusi sekalipun tidak mendapatkan pengaruh konsensus tanpa batas. Pendapatan imbalan blok mereka ditingkatkan secara proporsional dengan jumlah node mereka, yang mana ini adil karena mereka telah men-stake modal yang proporsional. Pengaruh konsensus mereka per putaran dibatasi oleh dedup kluster terlepas dari berapa banyak dompet yang mereka gunakan.
+Ini adalah risiko Sybil residual pada EXIOM setelah semua kontrol diterapkan. Ini dibatasi dalam konsekuensinya: deduplikasi kuorum HF23 membatasi setiap cluster kedekatan menjadi satu kursi kuorum per ronde terlepas dari struktur wallet, sehingga bahkan operator pemecah-wallet terdistribusi tidak memperoleh pengaruh konsensus tak terbatas. Pendapatan block reward mereka berskala dengan jumlah node mereka, yang adil karena mereka telah men-stake modal proporsional. Pengaruh konsensus mereka per ronde dibatasi oleh dedup cluster terlepas dari berapa banyak wallet yang mereka gunakan.
 
 ---
 
 ## Metodologi Pemantauan Berkelanjutan
 
-**Daftar hitam tata kelola.** Daftar hitam kunci publik yang dikelola tata kelola mencegah kunci pendaftaran yang masuk daftar blokir untuk mendaftarkan node baru. Operator yang berpindah ke kunci dompet baru saat kunci asli telah diblokir membuat rekam jejak penghindaran yang terdokumentasi, dan waktu bukti serta perilaku perutean kunci baru dikorelasikan terhadap profil historis kunci yang telah diblokir.
+**Blocklist tata kelola.** Blocklist kunci publik yang dikelola tata kelola mencegah kunci registrasi yang di-blocklist meregistrasi node baru. Operator yang pindah ke kunci wallet baru sementara yang asli di-blocklist menciptakan catatan terdokumentasi penghindaran, dan timing bukti serta perilaku routing kunci baru dikorelasikan terhadap profil historis kunci yang di-blocklist.
 
-**Analisis grafik slot kontributor.** Slot kontributor node layanan adalah sinyal identitas sekunder. Operator yang mendanai slot kontributor di beberapa kunci dompet mereka sendiri membuat grafik hubungan yang dapat diamati bahkan pada rantai privasi, karena transaksi pendaftaran kontributor membawa data yang dapat diamati tentang node mana yang mereka kontribusikan. Operator yang secara konsisten berkontribusi pada node yang terdaftar di bawah dompet A dari dompet B dan C, sementara dompet B dan C tersebut mendaftarkan node mereka sendiri, membuat grafik korelasi yang melengkapi sinyal pengklusteran kunci pendaftaran langsung.
+**Analisis grafik slot kontributor.** Slot kontributor service node adalah sinyal identitas sekunder. Operator yang mendanai slot kontributor di seluruh beberapa kunci wallet mereka sendiri menciptakan grafik hubungan yang dapat diamati bahkan pada chain privasi, karena transaksi registrasi kontributor membawa data yang dapat diamati tentang node mana yang mereka kontribusikan. Operator yang secara konsisten berkontribusi ke node yang terdaftar di bawah wallet A dari wallet B dan C, sementara wallet B dan C yang sama itu meregistrasi node mereka sendiri, menciptakan grafik korelasi yang melengkapi sinyal pengelompokan kunci registrasi langsung.
 
-**Pemantauan ASN.** IP setiap node aktif dipetakan ke Nomor Sistem Otonom (ASN) melalui data BGP publik. Jaringan melacak konsentrasi ASN di seluruh set node aktif. Node yang berbagi ASN berbagi infrastruktur tingkat penyedia dan paparan hukum. Konsentrasi ASN yang tinggi ditandai untuk peninjauan tata kelola bahkan ketika pendaftaran node individu tampak tidak berhubungan. Sinyal ASN tidak mengidentifikasi operator manusia, tetapi mengidentifikasi domain kegagalan.
+**Pemantauan ASN.** IP setiap node aktif dipetakan ke Autonomous System Number melalui data BGP publik. Jaringan melacak konsentrasi ASN di seluruh himpunan node aktif. Node yang berbagi ASN berbagi infrastruktur tingkat-penyedia dan eksposur hukum. Konsentrasi ASN tinggi ditandai untuk peninjauan tata kelola bahkan ketika registrasi node individual tampak tidak berhubungan. Sinyal ASN tidak mengidentifikasi operator manusia, tetapi ia mengidentifikasi failure domain.
 
-Status implementasi saat ini untuk semua kontrol yang dijelaskan dalam dokumen ini dikelola dalam [proposal Batasan Konsentrasi Node](https://github.comXEQMLabs/whitepaper/blob/main/concentration-limits-proposal.md).
+Status implementasi saat ini untuk semua kontrol yang dijelaskan dalam dokumen ini dipelihara dalam [proposal Batas Konsentrasi Node](https://github.com/XEQMLabs/whitepaper/blob/main/concentration-limits-proposal.md).
 
 ---
 
-*Dokumen ini bukan merupakan nasihat keuangan atau hukum. XEQM adalah koin utilitas untuk platform EXIOM, bukan produk investasi. Klasifikasi token, status sekuritas, dan peraturan yang berlaku bervariasi menurut yurisdiksi. Peserta harus berkonsultasi dengan kerangka hukum dan kualifikasi lokal mereka sebelum memperoleh atau beroperasi dengan XEQM. XEQM Labs tidak mendorong pembelian XEQM berdasarkan apresiasi harga spekulatif.*
+*Dokumen ini bukan merupakan nasihat keuangan atau hukum. XEQM adalah koin utilitas untuk platform EXIOM, bukan produk investasi. Klasifikasi token, status sekuritas, dan regulasi yang berlaku bervariasi menurut yurisdiksi. Peserta harus berkonsultasi dengan kerangka hukum dan regulasi lokal mereka sebelum memperoleh atau beroperasi dengan XEQM. XEQM Labs tidak mendorong pembelian XEQM atas dasar apresiasi harga spekulatif.*

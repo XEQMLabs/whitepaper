@@ -1,10 +1,10 @@
-> ⚠️ **Out of date.** This translation predates the October 2026 English revision (Lokinet-before-HF23 sequencing, SQLite light-node release, HF22/rev1 activation, and the proximity-cluster-not-country framing). The English version governs until this is re-synced.
-
-# Batasan Konsentrasi Node - Penegakan Kelangsungan Hidup Jaringan (Network Survivability Enforcement)
+# Batas Konsentrasi Node - Penegakan Daya Tahan Jaringan
 ## Pendamping Teknis untuk Whitepaper Tokenomics EXIOM
-### 26/07/2026
+### 07/26/2026
 
-Dokumen ini merupakan pendamping untuk Whitepaper Tokenomics EXIOM dan mengasumsikan bahwa whitepaper tersebut telah dibaca. Whitepaper tersebut mencakup apa itu kontrol konsentrasi dan mengapa kontrol tersebut ada. Dokumen ini mencakup rincian mekanis tentang cara kerja setiap kontrol, data validasi testnet di balik HF22, matematika ekonomi yang tepat di balik pengubah hadiah nol, pertanyaan identitas operator pada rantai privasi, serta risiko tersisa yang tidak sepenuhnya diselesaikan oleh protokol.
+> **Catatan cakupan (diperbarui Oktober 2026).** Unit yang ditegakkan adalah *cluster kedekatan* (sekelompok node yang berbagi infrastruktur fisik atau routing, dideteksi via kedekatan routing Lokinet, timing bukti-uptime, dan ASN), **bukan negara**. Negara dengan beberapa fasilitas independen tidak terpengaruh. Angka negara di bawah adalah proksi geografis kasar untuk di mana konsentrasi saat ini berada, bukan hal yang dibatasi protokol. Jumlah node dalam pendamping ini adalah snapshot Juli 2026 (~672 node); lihat whitepaper untuk total jaringan saat ini (943 node per 27 September 2026). Lokinet dirilis dalam rilis non-penegakan sebelum HF23, dan HF23 mengaktifkan penegakan.
+
+Dokumen ini adalah pendamping untuk Whitepaper Tokenomics EXIOM dan mengasumsikan whitepaper tersebut telah dibaca. Whitepaper mencakup apa kontrol konsentrasi itu dan mengapa mereka ada. Dokumen ini mencakup detail mekanis tentang bagaimana setiap kontrol bekerja, data validasi testnet di balik HF22, matematika ekonomi yang presisi di balik modifier reward-nol, pertanyaan identitas operator pada chain privasi, dan risiko residual yang tidak sepenuhnya diselesaikan protokol.
 
 ---
 
@@ -12,146 +12,146 @@ Dokumen ini merupakan pendamping untuk Whitepaper Tokenomics EXIOM dan mengasums
 
 | Negara | Node aktif |
 |---|---|
-| Prancis | 492 |
-| Jerman | 70 |
-| Amerika Serikat | 55 |
-| Kanada | 18 |
-| Polandia | 13 |
-| Britania Raya | 10 |
-| Turki | 5 |
+| France | 492 |
+| Germany | 70 |
+| United States | 55 |
+| Canada | 18 |
+| Poland | 13 |
+| United Kingdom | 10 |
+| Türkiye | 5 |
 | Australia | 4 |
-| Singapura | 2 |
-| Lituania | 2 |
+| Singapore | 2 |
+| Lithuania | 2 |
 | Serbia | 1 |
 
-Prancis yang mencakup sekitar 71% dari jaringan hampir seluruhnya berada di satu fasilitas Contabo di Grand Est. Ambang batas kelangsungan hidup (survivability threshold) yang ditetapkan dalam whitepaper adalah 30% dari node aktif per kluster, atau sekitar 208 node pada jumlah saat ini. Grand Est dengan 426 node bernilai lebih dari dua kali lipat ambang batas tersebut.
+France menampung 492 dari 672 node dalam snapshot ini (sekitar 73% dari jaringan), dan konsentrasi itu hampir seluruhnya adalah satu fasilitas Contabo di Grand Est yang menampung kira-kira 426 node (sekitar 63% dari jaringan). Total negara bukanlah yang dibatasi protokol; **cluster** Grand Est lah yang dibatasi. Ambang daya tahan adalah 30% node aktif per cluster kedekatan (sekitar 202 node pada snapshot 672 ini, dan sekitar 283 pada 943 node dalam whitepaper saat ini), dihitung ulang terus-menerus seiring jaringan tumbuh. Grand Est pada kira-kira 426 node lebih dari dua kali lipat cap itu.
 
 ---
 
-## Apa Artinya Ini Bagi Operator Node
+## Apa Artinya Ini bagi Operator Node
 
-Bagian ini menjawab pertanyaan secara langsung: bagaimana HF23 memengaruhi cara Anda menjalankan node?
+Bagian ini menjawab pertanyaan secara langsung: bagaimana HF23 memengaruhi cara Anda menjalankan node Anda?
 
-**HF23 tidak mewajibkan satu node per IP, satu node per VPS, atau satu node per dompet.** Batas maksimumnya adalah 30% dari jaringan aktif per kluster kedekatan (proximity cluster), saat ini sekitar 208 node. Operator yang menjalankan 10, 50, atau bahkan 100 node pada infrastruktur berbagi (shared infrastructure) sama sekali tidak terpengaruh oleh HF23 selama kluster mereka tetap berada di bawah ambang batas tersebut. Anda dapat menjalankan beberapa node pada satu mesin, satu akun VPS, dan satu dompet. Tidak ada hal dalam HF23 yang mengubah hal itu.
+**HF23 tidak membatasi berdasarkan negara, dan tidak mengharuskan satu node per IP, satu node per VPS, atau satu node per wallet.** Cap-nya adalah 30% dari jaringan aktif per *cluster kedekatan* (node yang berbagi infrastruktur fisik atau routing). Operator yang menjalankan 10, 50, atau bahkan 100 node pada infrastruktur bersama sama sekali tidak terpengaruh oleh HF23 selama cluster mereka tetap di bawah ambang batas itu. Anda dapat menjalankan beberapa node pada satu mesin, satu akun VPS, dan satu wallet. Tidak ada dalam HF23 yang mengubah itu.
 
-**Pengubah hadiah nol hanya berlaku untuk node yang berada di atas ambang batas kluster 208-node.** Node terdaftar tertua dalam sebuah kluster mendapatkan hadiah penuh hingga ambang batas tersebut. Hanya node yang berada di peringkat atasnya dalam kluster yang terlampau pekat (over-concentrated) yang menghasilkan nol hadiah, dan hanya sampai mereka dimigrasikan ke kluster yang kurang terkonsentrasi.
+**Modifier reward-nol hanya berlaku untuk node di atas cap per-cluster (30% node aktif).** Node terdaftar tertua dalam sebuah cluster memperoleh reward penuh hingga ambang batas itu. Hanya node yang diperingkat di atasnya dalam cluster yang terlalu-terkonsentrasi memperoleh nol, dan hanya sampai mereka dimigrasikan ke cluster yang kurang terkonsentrasi.
 
-**Deduplikasi kuorum membatasi pengaruh konsensus per putaran (round), bukan jumlah node atau pendapatan.** Operator yang menjalankan 50 node pada satu VPS mendapatkan hadiah blok dari seluruh 50 node tersebut dan mengelola infrastruktur mereka persis seperti yang mereka lakukan hari ini. Mereka menerima satu kursi kuorum per kluster per putaran alih-alih berpotensi mendapatkan banyak kursi, yang merupakan hasil yang memang ditujukan.
+**Deduplikasi kuorum membatasi pengaruh konsensus per ronde, bukan jumlah node atau pendapatan.** Operator yang menjalankan 50 node pada satu VPS memperoleh block reward pada semua 50 dan mengelola infrastruktur mereka persis seperti yang mereka lakukan hari ini. Mereka menerima satu kursi kuorum per cluster per ronde alih-alih berpotensi banyak, yang merupakan hasil yang dimaksudkan.
 
-**Pendekatan yang tepat untuk operator baru** adalah memeriksa penjelajah node, melihat di mana kluster yang ada terkonsentrasi, dan menerapkan node ke wilayah yang populasinya sedikit. Ten node pada satu server di Brasil atau Argentina berfungsi dengan sangat baik di bawah HF23 karena wilayah-wilayah tersebut jauh dari ambang batas 30%. Hadiah penuh, partisipasi kuorum penuh, tanpa masalah.
+**Pendekatan yang tepat untuk operator baru** adalah memeriksa node explorer, melihat di mana cluster yang ada terkonsentrasi, dan men-deploy ke cluster yang padat-ringan. Sepuluh node pada satu server dengan routing-nya sendiri yang berbeda bekerja dengan sangat baik di bawah HF23 karena cluster itu sama sekali tidak mendekati ambang batas 30%. Reward penuh, partisipasi kuorum penuh, tanpa masalah.
 
-**Dinamika ini menguntungkan Anda jika Anda melakukan penerapan ke wilayah yang jarang.** Jika suatu wilayah akhirnya terisi penuh, penjelajah node akan menampilkannya dan operator memiliki insentif finansial untuk berpindah sebelum batas tersebut memengaruhi mereka. Operator yang tiba lebih awal tetap mempertahankan hadiah penuh pada node tertua mereka hingga mencapai ambang batas. Pendaftaran baru ke dalam kluster yang terlampau pekat tidak menghasilkan apa-apa secara langsung, sehingga secara alami insentif ekonomi akan mendorong penerapan baru ke wilayah yang lebih longgar.
+**Dinamikanya bekerja menguntungkan Anda jika Anda men-deploy ke region yang jarang.** Jika suatu region akhirnya terisi penuh, node explorer menunjukkannya dan operator memiliki insentif finansial untuk pindah sebelum cap memengaruhi mereka. Operator yang sampai di sana lebih dulu mempertahankan reward penuh pada node tertua mereka hingga ambang batas. Registrasi baru ke cluster yang terlalu-terkonsentrasi memperoleh nol segera, sehingga ekonomi secara alami mendorong deployment baru ke region yang lebih ringan.
 
-**Masalah spesifik yang diselesaikan oleh HF23** adalah satu fasilitas di Prancis yang saat ini menampung sekitar 426 node, atau 61% dari jaringan. Jika fasilitas tersebut offline, jaringan akan berhenti. Tujuannya adalah membuat kluster tersebut berada di bawah 208 node. Setiap operator lain yang menjalankan penataan multi-node secara bertanggung jawab di wilayah yang tidak terkonsentrasi adalah persis apa yang lebih dibutuhkan oleh jaringan.
+**Masalah spesifik yang diselesaikan HF23** adalah satu fasilitas di France (cluster Contabo Grand Est) yang menampung kira-kira 426 node, sekitar 63% dari jaringan dalam snapshot ini. Jika fasilitas itu offline jaringan macet. Tujuannya adalah membawa cluster itu di bawah cap 30%. Setiap operator lain yang menjalankan setup multi-node yang bertanggung jawab di cluster yang tidak terkonsentrasi adalah persis apa yang lebih dibutuhkan jaringan.
 
 ---
 
 ## Mengapa Hard Fork Dipisahkan
 
-HF22 diluncurkan setelah pengujian berhasil. Deduplikasi kuorum kunci dompet dan penyatuan periode unbonding tidak memiliki ketergantungan pada Lokinet. Buahnya telah divalidasi pada testnet dan menahannya saat penilaian Lokinet masih tertunda merupakan penundaan yang tidak beralasan. Aktor canggih yang membaca whitepaper sebelum HF22 diluncurkan dapat mencoba pemisahan dompet untuk mendahului kontrol kuorum, namun tindakan tersebut dapat dideteksi melalui korelasi waktu bukti waktu aktif dan analisis IP/ASN serta menciptakan rekam jejak yang terdokumentasi untuk tindakan tata kelola.
+HF22 dirilis setelah pengujian yang sukses. Deduplikasi kuorum kunci-wallet dan unifikasi periode unbonding tidak memiliki ketergantungan pada Lokinet. Keduanya telah divalidasi di testnet dan menahannya sementara penilaian Lokinet tertunda adalah penundaan yang tidak dapat dibenarkan. Aktor canggih yang membaca whitepaper sebelum HF22 dirilis dapat mencoba pemecahan wallet untuk mendahului kontrol kuorum, tetapi melakukannya dapat dideteksi melalui korelasi timing bukti uptime dan analisis IP/ASN serta menciptakan catatan terdokumentasi untuk tindakan tata kelola.
 
-HF23 diluncurkan setelah penilaian rekayasa Lokinet selesai. Jika penilaian tersebut menghasilkan hasil berupa perubahan konfigurasi saja, HF23 dapat menyusul HF22 dengan cepat. Jika hasilnya memerlukan upaya rekayasa yang signifikan, Grand Est akan tetap terpapar pada risiko kelangsungan hidup penuh di luar dedup kuorum hingga HF23 siap. Memisahkan rilis ini juga memberikan domain kegagalan yang bersih: jika ada masalah setelah aktivasi HF23, variabel yang harus diisolasi menjadi lebih sedikit.
+Lokinet dirilis lebih dulu dalam rilis non-penegakannya sendiri (bersama perubahan penyimpanan light-node SQLite), sehingga transport baru tidak dibuat kritis-konsensus saat ia baru diperkenalkan. Selama rilis itu pengelompokan kedekatan berjalan aktif dan dapat diamati tanpa konsekuensi reward, yang merupakan saat jumlah cluster riil diukur dan ambang batas serta fallback HF23 disetel. HF23 kemudian menyusul dan mengaktifkan penegakan. Memisahkan rilis juga memberikan failure domain yang bersih: jika terjadi kesalahan setelah aktivasi HF23 ada lebih sedikit variabel untuk diisolasi. Sampai penegakan HF23 aktif, Grand Est tetap terekspos pada risiko daya tahan penuh di luar dedup kuorum HF22.
 
 ---
 
-## Mekanisme HF22
+## Mekanika HF22
 
-### Deduplikasi Kuorum Kunci Dompet
+### Deduplikasi Kuorum Kunci-Wallet
 
-Algoritma pemilihan kuorum menjalankan langkah deduplikasi pada setiap set kandidat sebelum difinalisasi. Ketika pengundian memilih node kandidat, algoritma memeriksa alamat dompet operatornya terhadap semua node yang sudah dipilih untuk putaran tersebut. Jika ditemukan kecocokan, kandidat tersebut digantikan dengan mengundi kembali dari kumpulan yang tersisa yang memenuhi syarat, dengan mengecualikan semua alamat yang sudah terwakili.
+Algoritme seleksi kuorum menjalankan pass deduplikasi atas setiap himpunan kandidat sebelum finalisasi. Ketika pengundian memilih node kandidat, algoritme memeriksa alamat wallet operatornya terhadap semua node yang sudah dipilih untuk ronde tersebut. Jika kecocokan ditemukan, kandidat diganti dengan mengundi lagi dari pool yang memenuhi syarat yang tersisa, mengecualikan semua alamat yang sudah terwakili.
 
-Pengundian pengganti tidak berputar kembali melalui kandidat yang sudah ditolak. Pengundian dilakukan dari kumpulan yang belum terpilih berdasarkan urutan pembobotan probabilitas yang sama yang digunakan untuk pengundian awal. Ini mempertahankan sifat statistik dari pemilihan kuorum tanpa memperkenalkan bias deterministik terhadap kumpulan node tersisa tertentu.
+Pengundian pengganti tidak berputar kembali melalui kandidat yang sudah ditolak. Ia mengundi dari pool tak-terpilih yang tersisa dalam urutan terbobot-probabilitas yang sama yang digunakan untuk pengundian awal. Ini menjaga properti statistik dari seleksi kuorum tanpa memperkenalkan bias deterministik ke arah himpunan node tersisa tertentu.
 
 **Hasil validasi testnet:**
-- Sembilan siklus stall/pemulihan telah diselesaikan
+- 20 siklus stall/pemulihan selesai (20/20)
 - Tingkat pemulihan 100% di seluruh siklus
-- Zero intervensi manual yang diperlukan dalam siklus mana pun
-- Baseline mainnet pra-HF22: 1.000 blok, 100% Pulse, nol blok GOV_SIGNED
-- Analisis batas waktu R0: tidak ada batas waktu R0 yang diperkenalkan dalam kondisi produksi. Analisis kepadatan mainnet saat ini mengonfirmasi bahwa setiap kluster IP berkepadatan tinggi adalah satu operator, yang berarti dedup kunci dompet telah memberikan perlindungan penuh terhadap penerapan paus (whale deployments) saat ini. Dua penerapan IP tunggal terbesar (masing-masing 58 node dan 51 node) merupakan satu operator dan dibatasi hingga satu kursi kuorum per putaran di bawah HF22.
+- Nol intervensi manual diperlukan dalam siklus mana pun (gap blok terburuk 83 detik)
+- Baseline mainnet pra-HF22: 1,000 blok, 100% Pulse, nol blok GOV_SIGNED
+- Analisis timeout R0: tidak ada timeout R0 yang diperkenalkan dalam kondisi produksi. Analisis kepadatan mainnet saat ini mengonfirmasi setiap cluster IP berkepadatan-tinggi adalah satu operator, yang berarti dedup kunci-wallet sudah memberikan perlindungan penuh terhadap deployment whale saat ini. Dua deployment IP-tunggal terbesar (masing-masing 58 node dan 51 node) masing-masing adalah satu operator dan dibatasi pada satu kursi kuorum per ronde di bawah HF22.
 
-**Arti satu kursi kuorum dalam praktiknya:** Ukuran kuorum dan frekuensi rotasi menentukan seberapa sering sebuah node berpartisipasi. Pada ukuran jaringan saat ini, batas satu kursi berarti pengaruh operator yang terkonsentrasi dalam sesi oracle, putaran Pulse, dan kuorum kewajiban adalah identik dengan operator yang memiliki satu node. Pendapatan hadiah blok mereka tidak berubah.
+**Apa arti satu kursi kuorum dalam praktik:** Ukuran kuorum dan frekuensi rotasi menentukan seberapa sering sebuah node berpartisipasi. Pada ukuran jaringan saat ini, cap kursi-tunggal berarti pengaruh operator terkonsentrasi dalam sesi oracle, ronde Pulse, dan kuorum kewajiban identik dengan pengaruh operator yang memiliki satu node. Pendapatan block reward mereka tidak berubah.
 
-**Celah pemisahan dompet dan deteksi sementara:** Operator yang membagi 426 node ke dalam 10 dompet mendapatkan hingga 10 kursi kuorum per putaran alih-alih satu. Ini adalah celah yang diketahui yang ditutup oleh HF23. Di masa interim, pemisahan dompet dapat dideteksi melalui dua sinyal yang sudah tersedia tanpa perubahan daemon. Pertama, waktu bukti waktu aktif: node pada host fisik atau hypervisor yang sama mengirimkan bukti dalam rentang milidetik satu sama lain, terlepas dari kunci dompet. Kluster bukti yang tiba dalam jendela sub-10ms dari node yang terdaftar ke dompet berbeda adalah sinyal kuat dari infrastruktur berbagi. Kedua, korelasi IP dan ASN: node pada dompet berbeda yang berbagi IP, subnet, atau ASN dicatat dan ditandai untuk peninjauan tata kelola. Operator yang membagi dompet tetapi mempertahankan semua node di fasilitas Contabo yang sama dapat diidentifikasi melalui kedua sinyal ini dan dapat dikenakan tindakan tata kelola di bawah kebijakan daftar blokir.
+**Celah pemecahan-wallet dan deteksi interimnya:** Operator yang memecah 426 node di seluruh 10 wallet mendapatkan hingga 10 kursi kuorum per ronde alih-alih satu. Ini adalah celah yang diketahui yang ditutup HF23. Sementara itu, pemecahan wallet dapat dideteksi melalui dua sinyal yang sudah tersedia tanpa perubahan daemon. Pertama, timing bukti uptime: node pada host fisik atau hypervisor yang sama mengirimkan bukti dalam milidetik satu sama lain, terlepas dari kunci wallet. Cluster bukti yang tiba dalam jendela sub-10ms dari node yang terdaftar ke wallet berbeda adalah sinyal kuat infrastruktur bersama. Kedua, korelasi IP dan ASN: node pada wallet berbeda yang berbagi IP, subnet, atau ASN dicatat dan ditandai untuk peninjauan tata kelola. Operator yang memecah-wallet tetapi menjaga semua node di fasilitas Contabo yang sama dapat diidentifikasi melalui kedua sinyal dan tunduk pada tindakan tata kelola di bawah kebijakan blocklist.
 
-### Penyatuan Periode Unbonding
+### Unifikasi Periode Unbonding
 
-Periode unbonding pendaftaran ulang paksa berubah dari 10.080 blok (sekitar 7 hari) menjadi 20.160 blok (sekitar 14 hari), mencocokkan periode penarikan sukarela. Ini merupakan perubahan konstanta konsensus.
+Periode unbonding deregistrasi paksa berubah dari 10,080 blok (sekitar 7 hari) menjadi 20,160 blok (sekitar 14 hari), menyamai periode penarikan sukarela. Ini adalah perubahan konstanta konsensus.
 
-Periode paksa 7 hari yang asli adalah pilihan sengaja selama stabilisasi jaringan untuk membatasi hukuman pada operator yang mengalami masalah infrastruktur di luar kendali mereka. Alasan tersebut tidak lagi berlaku. Jaringan telah stabil, sistem kredit penghentian layanan (decommission credit system) menyediakan penyangga untuk gangguan singkat, dan periode 14 hari yang terpadu menghilangkan asimetri yang tidak lagi memiliki pembenaran.
+Periode paksa 7-hari asli adalah pilihan yang disengaja selama stabilisasi jaringan untuk membatasi penalti pada operator yang mengalami peristiwa infrastruktur di luar kendali mereka. Rasional itu tidak lagi berlaku. Jaringan stabil, sistem kredit decommission menyediakan buffer untuk pemadaman singkat, dan periode terunifikasi 14-hari menghapus asimetri yang tidak memiliki justifikasi tersisa.
 
-Koin XEQM terkunci secara on-chain selama periode unbonding melalui transaksi pendaftaran. Tidak ada mekanisme untuk melepaskan kuncian lebih awal tanpa perubahan protokol. Untuk kegagalan infrastruktur yang terdokumentasi, tata kelola dapat memulihkan hadiah yang terlewat dari dompet tata kelola sebagai transfer XEQM, tetapi kuncian on-chain tetap berjalan selama durasi penuhnya.
-
----
-
-## Mekanisme HF23
-
-### Pengklusteran Kedekatan Lokinet
-
-Lokinet (Low Latency Anonymous Routing Protocol, LLARP) mengarahkan lalu lintas melalui jaringan node layanan di layer 3, mendukung TCP, UDP, dan ICMP. Setiap node layanan berpartisipasi sebagai relay. Grafik perutean yang muncul mencerminkan topologi jaringan fisik: node di fasilitas yang sama merute melalui sakelar upstream yang sama dan backbone pusat data yang sama, menghasilkan pilihan jalur yang berkorelasi dan latensi antar-node sub-milidetik. Node di fasilitas yang berbeda merute melalui jalur yang berbeda dengan latensi yang terukur lebih tinggi.
-
-Algoritma pengklusteran mengagregasi pengukuran latensi perutean Lokinet berpasangan dan tumpang tindih jalur di seluruh node aktif dan mengelompokkannya ke dalam kluster menggunakan pengukuran ini sebagai sinyal kedekatan. Kluster bukanlah wilayah geografis tetap; ini adalah pengelompokan dinamis dari node-node yang perilaku peruteannya menunjukkan infrastruktur fisik yang berbagi. Dua node di fasilitas Contabo yang berbeda di negara yang berbeda dapat merute melalui cukup banyak infrastruktur backbone Contabo yang sama sehingga muncul dalam kluster yang sama jika tumpang tindih jalurnya cukup tinggi. Dua node di pusat data yang sama tetapi pada mesin fisik berbeda dengan koneksi upstream yang berbeda akan muncul dalam kluster berbeda jika tumpang tindih jalurnya rendah.
-
-Sinyal tambahan yang digunakan bersama dengan kedekatan Lokinet:
-
-**Korelasi waktu bukti waktu aktif.** Jaringan telah menerima bukti waktu aktif dari semua node aktif secara teratur. Distribusi stempel waktu dari kedatangan bukti setiap node dicatat oleh node penerima. Node pada host fisik atau VM hypervisor yang sama mengirimkan bukti dalam jendela ketat yang khas, biasanya di bawah 10 milidetik. Mengklusterkan distribusi waktu kedatangan ini memberikan sinyal ko-lokasi fisik yang tidak memerlukan perubahan daemon dan berfungsi sebelum Lokinet aktif.
-
-**Analisis ASN.** Alamat IP setiap node dipetakan ke Nomor Sistem Otonom (Autonomous System Number/ASN) melalui data BGP publik. Node yang berbagi ASN berbagi infrastruktur perutean tingkat penyedia dan paparan hukum tingkat penyedia. Penyedia yang menerima perintah tingkat yurisdiksi yang memengaruhi seluruh infrastruktur mereka akan mematikan semua node ASN mereka secara bersamaan, terlepas dari berapa banyak kluster Lokinet tempat mereka muncul. Konsentrasi ASN dilacak sebagai sinyal tambahan dan berkontribusi pada peninjauan tata kelola terhadap operator yang mendekati ambang batas kluster.
-
-### Batas Pendaftaran Kluster
-
-Pada saat pendaftaran, protokol menjalankan evaluasi kedekatan terhadap semua kluster yang ada. Karakteristik perutean Lokinet dari node yang mendaftar diukur terhadap titik tengah dari masing-masing kluster yang ada. Jika kluster terdekat sudah berisi 30% atau lebih dari node aktif, pendaftaran ditolak dengan kode kesalahan spesifik yang menunjukkan kapasitas kluster dan jumlah node dari kluster terdekat.
-
-Penolakan tersebut bersifat deterministik: setiap node yang merute secara cukup mirip dengan kluster yang terlampau pekat sehingga dimasukkan ke dalamnya akan ditolak, terlepas dari kunci dompet operator, riwayat pendaftaran, atau jumlah stake. Operator tidak dapat membanding penolakan tersebut melalui tata kelola. Satu-satunya jalan keluar adalah mendaftar pada infrastruktur yang merute ke kluster berbeda.
-
-Ambang batas dievaluasi terhadap jumlah node aktif pada saat pendaftaran. Seiring tumbuhnya jaringan, ambang batas 30% dalam angka mutlak juga ikut tumbuh. Operator yang berada pada batas maksimum hari ini dapat mendaftarkan node tambahan di kluster yang sebelumnya dibatasi seiring tumbuhnya jaringan dan naiknya batas mutlak, tanpa memindahkan node yang sudah ada.
-
-### Pengubah Hadiah Nol
-
-Pengubah hadiah nol diterapkan pada saat perhitungan hadiah blok. Perhitungan hadiah untuk node yang dipilih mencakup pemeriksaan kelayakan kluster. Jika kluster node berisi lebih banyak node daripada ambang batas maksimum, dan peringkat pendaftaran node dalam kluster tersebut berada di atas ambang batas (diurutkan dari yang tertua hingga terbaru), perhitungan hadiah menghasilkan nol.
-
-Peringkat dihitung dari ketinggian blok pendaftaran (registration block height) node dalam penetapan kluster-nya. Node terdaftar tertua dalam kluster mendapatkan peringkat 1, yang paling baru terdaftar mendapatkan peringkat N. Node dengan peringkat lebih besar dari ambang batas maksimum mendapatkan hadiah nol. Node dengan peringkat pada atau di bawah ambang batas mendapatkan hadiah standar penuh. Peringkat dihitung ulang setiap kali penetapan kluster berubah, yang terjadi ketika node berpindah keluar dari kluster, ketika node baru bergabung, atau ketika batas kluster bergeser karena perubahan topologi jaringan.
-
-**Matematika ekonomi untuk Est Grand:** Pada 426 node dengan batas 208-node, 218 node menghasilkan nol hadiah blok. Pada harga self-hosted $0,53 per node per bulan, 218 node tersebut memerlukan biaya $115,54 per bulan dengan nol pendapatan. Pada harga Pecunia $1,76 per node per bulan, biayanya adalah $383,68 per bulan. Operator memiliki dua respons rasional: memindahkan node berlebih ke kluster yang tidak terkonsentrasi, yang langsung memulihkan hadiah mereka begitu pendaftaran baru diterima, atau menghapus pendaftaran node berlebih dan mengembalikan XEQM yang distake melalui proses unbonding. Salah satu dari respons ini mengurangi konsentrasi. Tidak ada dasar rasional untuk mempertahankan node berlebih pada hadiah nol.
-
-**Mekanisme masa tenggang:** Pada blok aktivasi HF23, protokol mengambil rekaman dari semua kluster aktif dan jumlah node mereka. Setiap kluster yang melebihi ambang batas 30% ditandai sebagai terlampau pekat. Selama 30 hari setelah blok aktivasi, pengubah hadiah nol ditangguhkan untuk semua node, termasuk yang berada di atas ambang batas. Selama masa tenggang, pemilik node dapat mengamati penataan kluster pada penjelajah node, merencanakan migrasi, dan mulai mengeksekusinya. Pada blok kadaluarsa masa tenggang, pengubah diaktifkan. Node yang telah berpindah keluar dari kluster yang terlampau pekat pada blok tersebut menghasilkan hadiah penuh sejak blok tersebut dan seterusnya. Node yang masih berada di atas ambang batas menghasilkan nol sejak blok tersebut dan seterusnya hingga mereka berpindah.
-
-### Deduplikasi Kuorum Kluster Kedekatan
-
-Peningkatan deduplikasi kuorum HF23 menggantikan pemeriksaan alamat dompet dengan pemeriksaan keanggotaan kluster. Ketika pengundian memilih node kandidat, algoritma memeriksa penetapan kluster-nya terhadap semua node yang sudah dipilih untuk putaran tersebut. Jika dua node berbagi penetapan kluster, node kedua digantikan oleh pengundian dari kumpulan yang tersisa, dengan mengecualikan semua kluster yang sudah terwakili.
-
-Efek praktis pada operator yang membagi dompet: 10 alamat dompet di seluruh 426 node yang semuanya berada di fasilitas Contabo yang sama muncul dalam kluster kedekatan yang sama. Pemeriksaan kluster menangkap mereka semua sebagai satu kesatuan. Satu node dari kluster tersebut memegang satu kursi. 425 node lainnya dari kluster tersebut tidak memegang kursi, tidak peduli berapa banyak alamat dompet berbeda tempat mereka terdaftar.
-
-### Persyaratan Jumlah Kluster Minimum dan Aturan Cadangan
-
-Ukuran kuorum jaringan EXIOM adalah 12 kursi per putaran. Oleh karena itu, deduplikasi kluster kedekatan memerlukan setidaknya 12 kluster kedekatan yang berbeda dalam kumpulan node aktif untuk menjamin pembentukan kuorum. Jika jaringan menghasilkan kurang dari 12 kluster yang berbeda, algoritma tidak dapat memenuhi batasan satu-kursi-per-kluster dan pembentukan kuorum gagal.
-
-Distribusi jaringan saat ini, setelah pengklusteran kedekatan Lokinet diterapkan, diperkirakan menghasilkan antara 12 hingga 18 kluster yang berbeda. Ini sangat dekat dengan minimum 12 kursi. Infrastruktur backbone penyedia yang berbagi antara fasilitas yang secara nominal terpisah dapat menyebabkan dua lokasi IP yang berbeda bergabung menjadi satu kluster kedekatan dalam grafik perutean Lokinet. Penggabungan semacam itu yang mengurangi jumlah kluster di bawah 12 merusak pembentukan kuorum secara keseluruhan.
-
-Oleh karena itu, algoritma menerapkan aturan cadangan wajib:
-
-1. Algoritma mencoba mengisi seluruh 12 kursi dengan satu node per kluster yang berbeda, memproses kluster yang tersedia secara acak.
-2. Jika semua kluster yang berbeda telah habis sebelum 12 kursi terisi, algoritma masuk ke tahap cadangan.
-3. Dalam tahap cadangan, algoritma mengizinkan node kedua dari setiap kluster, dimulai dari kluster terkecil terlebih dahulu. Kluster yang paling tidak terkonsentrasi menerima kursi kedua sebelum kluster yang paling terkonsentrasi.
-4. Algoritma melanjutkan tahap cadangan, menambah maksimum kursi per kluster sebanyak satu pada setiap tahap, hingga 12 kursi terisi.
-5. Kluster yang paling terkonsentrasi, seperti Grand Est dalam kondisi saat ini, menerima kursi tambahan hanya setelah semua kluster yang lebih kecil diberikan alokasi cadangannya.
-
-Setiap putaran yang memicu cadangan dicatat bersama dengan jumlah kluster yang menyebabkannya. Tata kelola memantau frekuensi cadangan sebagai indikator risiko konsentrasi langsung. Jaringan dengan 12 atau lebih kluster yang berbeda tidak pernah memicu cadangan. Jaringan yang secara konsisten memicu cadangan memberi sinyal bahwa penegakan konsentrasi HF23 belum mencapai keberagaman fisik yang memadai dan bahwa batas kluster atau penegakan masa tenggang memerlukan perhatian tata kelola.
-
-Log cadangan dipublikasikan di penjelajah node bersama penetapan kluster sehingga komunitas operator dapat mengamati risiko konsentrasi secara real time.
+Koin XEQM terkunci on-chain selama periode unbonding via transaksi registrasi. Tidak ada mekanisme untuk melepaskan kunci lebih awal tanpa perubahan protokol. Untuk kegagalan infrastruktur terdokumentasi, tata kelola dapat mengompensasi reward yang terlewat dari wallet tata kelola sebagai transfer XEQM, tetapi kunci on-chain berjalan durasi penuhnya terlepas.
 
 ---
 
-## Identitas Operator pada Rantai Privasi
+## Mekanika HF23
 
-Protokol tidak perlu mengidentifikasi manusia mana yang memiliki node mana untuk menegakkan batas kluster dan pengubah hadiah nol. Kedua kontrol beroperasi pada tingkat kluster. Apa yang dapat dan tidak dapat ditentukan adalah konteks yang berguna untuk pemantauan tata kelola tetapi tidak diperlukan untuk penegakan protokol.
+### Pengelompokan Kedekatan Lokinet
 
-**Apa yang bersifat deterministik dari data on-chain:** node yang terdaftar di bawah kunci dompet operator yang sama secara pasti merupakan operator yang sama. Ini adalah informasi publik dalam transaksi pendaftaran.
+Lokinet (Low Latency Anonymous Routing Protocol, LLARP) merutekan lalu lintas melalui jaringan service node pada layer 3, mendukung TCP, UDP, dan ICMP. Setiap service node berpartisipasi sebagai relay. Routing graph yang muncul mencerminkan topologi jaringan fisik: node di fasilitas yang sama merutekan melalui switch upstream yang sama dan backbone datacenter yang sama, menghasilkan pemilihan jalur berkorelasi dan latensi antar-node sub-milidetik. Node di fasilitas berbeda merutekan melalui jalur berbeda dengan latensi yang terukur lebih tinggi.
 
-**Apa yang dapat disimpulkan dengan keyakinan tinggi dari Lokinet dan data waktu:** jumlah host fisik berbeda yang mendasari sebuah kluster node, terlepas dari berapa banyak kunci dompet yang mereka gunakan. Lima kunci dompet yang masing-masing menjalankan 85 node, semuanya pada dua server fisik yang sama, menghasilkan dua tanda tangan waktu (timing signatures) berbeda dan dua titik tengah kedekatan Lokinet, bukan lima.
+Algoritme pengelompokan menyerap pengukuran latensi routing Lokinet berpasangan dan tumpang tindih jalur di seluruh node aktif dan mengelompokkan mereka ke dalam cluster menggunakan pengukuran ini sebagai sinyal kedekatan. Sebuah cluster bukanlah region geografis tetap; ia adalah pengelompokan dinamis node yang perilaku routing-nya mengindikasikan infrastruktur fisik bersama. Dua node di fasilitas Contabo berbeda di negara berbeda mungkin merutekan melalui cukup banyak infrastruktur backbone Contabo bersama untuk muncul dalam cluster yang sama jika tumpang tindih jalur mereka cukup tinggi. Dua node di datacenter yang sama tetapi pada mesin fisik berbeda dengan koneksi upstream berbeda akan muncul dalam cluster berbeda jika tumpang tindih jalur mereka rendah.
 
-**Apa yang tidak dapat ditentukan pada rantai privasi:** apakah dua kunci dompet yang berbeda dengan infrastruktur terpisah milik operator manusia yang sama. Sumber pendanaan dari setiap kunci dompet bersifat privat berdasarkan desain. Operator canggih yang menggunakan lima dompet yang didanai dari lima sumber berbeda melalui lapisan transaksi rantai privasi menyajikan lima identitas berbeda pada tingkat protokol.
+Sinyal suplemental yang digunakan bersama kedekatan Lokinet:
 
-Untuk penegakan kelangsungan hidup, hal ini tidak masalah. Kluster tersebut berisi 426 node. 208 yang tertua menghasilkan hadiah. 218 yang terbaru menghasilkan nol. Identitas operator tidak relevan dengan perhitungan tersebut.
+**Korelasi timing bukti uptime.** Jaringan sudah menerima bukti uptime dari semua node aktif pada jadwal reguler. Distribusi timestamp kedatangan bukti dari setiap node dicatat oleh node penerima. Node pada host fisik atau hypervisor VM yang sama mengirimkan bukti dalam jendela rapat yang khas, biasanya di bawah 10 milidetik. Mengelompokkan distribusi timing kedatangan ini menyediakan sinyal kolokasi fisik yang tidak memerlukan perubahan daemon dan bekerja sebelum Lokinet aktif.
+
+**Analisis ASN.** Alamat IP setiap node dipetakan ke Autonomous System Number via data BGP publik. Node yang berbagi ASN berbagi infrastruktur routing tingkat-penyedia dan eksposur hukum tingkat-penyedia. Penyedia yang menerima perintah tingkat-yurisdiksi yang memengaruhi semua infrastruktur mereka menjatuhkan semua node ASN mereka secara bersamaan, terlepas dari berapa banyak cluster Lokinet tempat mereka muncul. Konsentrasi ASN dilacak sebagai sinyal suplemental dan berkontribusi pada peninjauan tata kelola operator yang dekat ambang cluster.
+
+### Batas Registrasi Cluster
+
+Pada saat registrasi, protokol menjalankan evaluasi kedekatan terhadap semua cluster yang ada. Karakteristik routing Lokinet node yang meregistrasi diukur terhadap centroid setiap cluster yang ada. Jika cluster terdekat sudah berisi 30% atau lebih dari node aktif, registrasi ditolak dengan kode error spesifik yang mengindikasikan kapasitas cluster dan jumlah node dari cluster terdekat.
+
+Penolakan bersifat deterministik: node mana pun yang merutekan cukup mirip dengan cluster yang terlalu-terkonsentrasi untuk ditetapkan kepadanya ditolak, terlepas dari kunci wallet operator, riwayat registrasi, atau jumlah stake. Operator tidak dapat mengajukan banding atas penolakan melalui tata kelola. Satu-satunya jalan ke depan adalah meregistrasi pada infrastruktur yang merutekan ke cluster berbeda.
+
+Ambang batas dievaluasi terhadap jumlah node aktif pada saat registrasi. Seiring jaringan tumbuh, ambang 30% dalam istilah absolut tumbuh bersamanya. Operator pada cap hari ini dapat meregistrasi node tambahan dalam cluster yang sebelumnya di-cap seiring jaringan tumbuh dan cap absolut naik, tanpa memigrasikan node yang ada mana pun.
+
+### Modifier Reward-Nol
+
+Modifier reward-nol diterapkan pada saat kalkulasi block reward. Kalkulasi reward untuk node yang terpilih mencakup pemeriksaan kelayakan cluster. Jika cluster node berisi lebih banyak node daripada ambang cap, dan peringkat registrasi node dalam cluster itu di atas ambang batas (diperingkat tertua ke terbaru), kalkulasi reward mengembalikan nol.
+
+Peringkat dihitung dari tinggi blok registrasi node dalam penetapan cluster-nya. Node terdaftar tertua dalam cluster mendapat peringkat 1, yang paling baru terdaftar mendapat peringkat N. Node dengan peringkat lebih besar dari ambang cap memperoleh nol. Node dengan peringkat pada atau di bawah ambang cap memperoleh reward standar penuh. Peringkat dihitung ulang setiap kali penetapan cluster berubah, yang terjadi ketika node bermigrasi keluar dari cluster, ketika node baru bergabung, atau ketika batas cluster bergeser karena perubahan topologi jaringan.
+
+**Matematika ekonomi untuk Grand Est:** Pada 426 node dengan cap 208-node, 218 node memperoleh block reward nol. Pada harga self-hosted $0.53 per node per bulan, 218 node itu menelan biaya $115.54 per bulan tanpa pendapatan. Pada harga Pecunia $1.76 per node per bulan, biayanya $383.68 per bulan. Operator memiliki dua respons rasional: memigrasikan node berlebih ke cluster yang tidak terkonsentrasi, memulihkan reward mereka segera setelah registrasi baru diterima, atau men-deregistrasi node berlebih dan memulihkan XEQM yang di-stake melalui proses unbonding. Respons mana pun mengurangi konsentrasi. Tidak ada dasar rasional untuk mempertahankan node berlebih pada reward nol.
+
+**Mekanika periode tenggang:** Pada blok aktivasi HF23, protokol mengambil snapshot semua cluster aktif dan jumlah node mereka. Cluster mana pun yang melebihi ambang 30% ditandai sebagai terlalu-terkonsentrasi. Selama 30 hari setelah blok aktivasi, modifier reward-nol ditangguhkan untuk semua node, termasuk yang di atas ambang cap. Selama periode tenggang, pemilik node dapat mengamati penetapan cluster node explorer, merencanakan migrasi, dan mulai mengeksekusinya. Pada blok berakhirnya periode tenggang, modifier aktif. Node yang telah bermigrasi keluar dari cluster yang terlalu-terkonsentrasi pada blok itu memperoleh reward penuh dari blok itu ke depan. Node yang masih di atas ambang batas memperoleh nol dari blok itu ke depan sampai mereka bermigrasi.
+
+### Deduplikasi Kuorum Cluster Kedekatan
+
+Peningkatan deduplikasi kuorum HF23 menggantikan pemeriksaan alamat wallet dengan pemeriksaan keanggotaan cluster. Ketika pengundian memilih node kandidat, algoritme memeriksa penetapan cluster-nya terhadap semua node yang sudah dipilih untuk ronde tersebut. Jika dua node berbagi penetapan cluster, yang kedua diganti dengan pengundian dari pool yang tersisa, mengecualikan semua cluster yang sudah terwakili.
+
+Efek praktis pada operator pemecah-wallet: 10 alamat wallet di seluruh 426 node semuanya di fasilitas Contabo yang sama muncul dalam cluster kedekatan yang sama. Pemeriksaan cluster menangkap mereka semua sebagai satu unit. Satu node dari cluster itu memegang kursi. 425 node lainnya dari cluster itu tidak, terlepas dari berapa banyak alamat wallet berbeda yang menjadi tempat mereka terdaftar.
+
+### Persyaratan Jumlah Cluster Minimum dan Aturan Fallback
+
+Ukuran kuorum jaringan EXIOM adalah 12 kursi per ronde. Oleh karena itu deduplikasi cluster kedekatan memerlukan setidaknya 12 cluster kedekatan yang berbeda dalam himpunan node aktif untuk menjamin pembentukan kuorum. Jika jaringan menghasilkan kurang dari 12 cluster berbeda, algoritme tidak dapat memenuhi batasan satu-kursi-per-cluster dan pembentukan kuorum gagal.
+
+Distribusi jaringan saat ini, begitu pengelompokan kedekatan Lokinet diterapkan, diperkirakan menghasilkan antara 12 dan 18 cluster berbeda. Ini sangat dekat secara tidak nyaman dengan minimum 12-kursi. Infrastruktur backbone penyedia bersama antara fasilitas yang secara nominal terpisah dapat menyebabkan dua lokasi IP berbeda menyatu menjadi satu cluster kedekatan dalam routing graph Lokinet. Penggabungan semacam itu yang mengurangi jumlah cluster di bawah 12 sepenuhnya merusak pembentukan kuorum.
+
+Oleh karena itu algoritme mengimplementasikan aturan fallback wajib:
+
+1. Algoritme mencoba mengisi semua 12 kursi dengan satu node per cluster berbeda, bekerja melalui cluster yang tersedia dalam urutan acak.
+2. Jika semua cluster berbeda habis sebelum 12 kursi terisi, algoritme memasuki pass fallback.
+3. Dalam pass fallback, ia mengizinkan node kedua dari setiap cluster, dimulai dengan cluster terkecil terlebih dahulu. Cluster yang paling tidak terkonsentrasi menerima kursi kedua sebelum yang paling terkonsentrasi.
+4. Algoritme melanjutkan pass fallback, menaikkan kursi maksimum per cluster satu per pass, sampai 12 kursi terisi.
+5. Cluster paling terkonsentrasi, seperti Grand Est di bawah kondisi saat ini, menerima kursi tambahan hanya setelah semua cluster yang lebih kecil diberi alokasi fallback mereka.
+
+Setiap ronde yang memicu fallback dicatat dengan jumlah cluster yang menyebabkannya. Tata kelola memantau frekuensi fallback sebagai indikator risiko konsentrasi langsung. Jaringan dengan 12 atau lebih cluster berbeda tidak pernah memicu fallback. Jaringan yang secara konsisten memicu fallback memberi sinyal bahwa penegakan konsentrasi HF23 belum mencapai keragaman fisik yang memadai dan bahwa cap cluster atau penegakan periode tenggang memerlukan perhatian tata kelola.
+
+Log fallback dipublikasikan di node explorer bersama penetapan cluster sehingga komunitas operator dapat mengamati risiko konsentrasi secara real time.
+
+---
+
+## Identitas Operator pada Chain Privasi
+
+Protokol tidak perlu mengidentifikasi operator manusia mana yang memiliki node mana untuk menegakkan cap cluster dan modifier reward-nol. Kedua kontrol beroperasi pada tingkat cluster. Apa yang dapat dan tidak dapat ditentukan adalah konteks berguna untuk pemantauan tata kelola tetapi tidak diperlukan untuk penegakan protokol.
+
+**Apa yang deterministik dari data on-chain:** node yang terdaftar di bawah kunci wallet operator yang sama secara definitif adalah operator yang sama. Ini adalah informasi publik dalam transaksi registrasi.
+
+**Apa yang dapat disimpulkan dengan keyakinan tinggi dari data Lokinet dan timing:** jumlah host fisik berbeda yang mendasari cluster node, terlepas dari berapa banyak kunci wallet yang mereka gunakan. Lima kunci wallet yang masing-masing menjalankan 85 node, semuanya pada dua server fisik yang sama, menghasilkan dua tanda tangan timing berbeda dan dua centroid kedekatan Lokinet, bukan lima.
+
+**Apa yang tidak dapat ditentukan pada chain privasi:** apakah dua kunci wallet berbeda dengan infrastruktur berbeda milik operator manusia yang sama. Sumber pendanaan setiap kunci wallet bersifat privat secara desain. Operator canggih yang menggunakan lima wallet yang didanai dari lima sumber berbeda melalui lapisan transaksi chain privasi menyajikan lima identitas berbeda pada tingkat protokol.
+
+Untuk penegakan daya tahan, ini tidak penting. Cluster berisi 426 node. 208 tertua memperoleh reward. 218 terbaru memperoleh nol. Identitas operator tidak relevan dengan kalkulasi itu.
 
 ---
 
@@ -159,35 +159,37 @@ Untuk penegakan kelangsungan hidup, hal ini tidak masalah. Kluster tersebut beri
 
 | Kontrol | Status |
 |---|---|
-| Dedup kuorum kunci dompet operator | HF22, memasuki testnet, divalidasi |
-| Penyatuan periode unbonding, 7 ke 14 hari | HF22, memasuki testnet |
-| Aktivasi Lokinet sebagai transport jaringan | Penilaian rekayasa sedang berlangsung |
-| Algoritma pengklusteran kedekatan | Tahap desain, menunggu penilaian Lokinet |
-| Batas pendaftaran kluster, ambang batas 30% | HF23, tahap desain |
-| Pengubah hadiah nol untuk node berlebih | HF23, tahap desain |
-| Mekanisme masa tenggang | HF23, tahap desain |
-| Dedup kuorum kluster kedekatan dengan aturan cadangan | HF23, tahap desain |
-| Pemantauan jumlah kluster minimum dan pencatatan cadangan | HF23, tahap desain |
-| Alat korelasi waktu bukti waktu aktif | Tidak ada perubahan daemon yang diperlukan, alat dalam pengembangan |
-| Suplemen pengklusteran ASN | Tidak ada perubahan daemon yang diperlukan, alat dalam pengembangan |
+| Dedup kuorum kunci-wallet operator | HF22, diaktifkan pada blok 219120 |
+| Unifikasi periode unbonding, 7 ke 14 hari | HF22, diaktifkan |
+| Pemulihan stall Pulse (fallback tanda tangan, snode_revision 1) | Diaktifkan pada blok 236920, 18 Oktober 2026 |
+| Aktivasi Lokinet sebagai transport jaringan | Dalam pengembangan; dirilis dalam rilis non-penegakan sebelum HF23 |
+| Penyimpanan light-node SQLite | Dalam pengembangan; dirilis bersama rilis Lokinet pra-HF23 |
+| Algoritme pengelompokan kedekatan | Fase desain, menunggu penilaian Lokinet |
+| Batas registrasi cluster, ambang 30% | HF23, fase desain |
+| Modifier reward-nol untuk node berlebih | HF23, fase desain |
+| Mekanisme periode tenggang | HF23, fase desain |
+| Dedup kuorum cluster kedekatan dengan aturan fallback | HF23, fase desain |
+| Pemantauan jumlah cluster minimum dan logging fallback | HF23, fase desain |
+| Perkakas korelasi timing bukti uptime | Tanpa perubahan daemon diperlukan, perkakas dalam pengembangan |
+| Suplemen pengelompokan ASN | Tanpa perubahan daemon diperlukan, perkakas dalam pengembangan |
 
 ---
 
-## Apa yang Tidak Diselesaikan oleh Kontrol Ini
+## Apa yang Tidak Diselesaikan Kontrol Ini
 
-**Konsentrasi hukum tingkat penyedia.** Penyedia yang menerima perintah hukum tingkat yurisdiksi yang memengaruhi seluruh infrastruktur global mereka akan mematikan semua node mereka secara bersamaan, bahkan jika node tersebut muncul di beberapa kluster kedekatan Lokinet. Analisis ASN memunculkan risiko ini tetapi protokol tidak dapat menegakkan keberagaman penyedia tanpa mengharuskan operator mengungkapkan identitas penyedia mereka. Penyebaran geografis yang dihasilkan secara alami oleh batas kluster secara substansial memitigasi risiko ini dalam praktiknya, karena operator yang terpaksa mendistribusikan ke seluruh kluster dalam praktiknya akan menggunakan beberapa penyedia.
+**Konsentrasi hukum tingkat-penyedia.** Penyedia yang menerima perintah hukum tingkat-yurisdiksi yang memengaruhi semua infrastruktur global mereka menjatuhkan semua node mereka secara bersamaan, bahkan jika node tersebut muncul dalam beberapa cluster kedekatan Lokinet. Analisis ASN memunculkan risiko ini tetapi protokol tidak dapat menegakkan keragaman penyedia tanpa mengharuskan pengungkapan operator atas identitas penyedia mereka. Sebaran geografis yang secara alami dihasilkan oleh cap cluster secara substansial memitigasi risiko ini dalam praktik, karena operator yang terpaksa mendistribusikan di seluruh cluster dalam praktik akan menggunakan beberapa penyedia.
 
-**Penentuan identitas operator manusia di seluruh pemisahan dompet rantai privasi.** Seperti dijelaskan di atas, operator canggih yang menggunakan beberapa dompet yang didanai melalui rantai privasi tidak dapat diidentifikasi pada tingkat protokol. Batas kluster dan pengubah hadiah nol mengatasi risiko domain kegagalan tanpa memandang identitas. Dedup kuorum menutup celah pengaruh konsensus pada HF23. Risiko tersisa adalah operator canggih menjalankan banyak node di banyak kluster yang benar-benar berbeda, mengumpulkan pendapatan hadiah blok secara proporsional dengan jumlah node mereka sambil berkontribusi secara proporsional terhadap kesehatan jaringan. Ini adalah hasil yang dapat diterima: pengaruh konsensus yang terkonsentrasi dibatasi; partisipasi modal yang terdistribusi diberi hadiah.
+**Penentuan identitas operator manusia di seluruh pemecahan wallet chain-privasi.** Seperti dijelaskan di atas, operator canggih yang menggunakan beberapa wallet yang didanai melalui chain privasi tidak dapat diidentifikasi pada tingkat protokol. Cap cluster dan modifier reward-nol mengatasi risiko failure domain terlepas dari identitas. Dedup kuorum menutup celah pengaruh konsensus di HF23. Risiko residualnya adalah bahwa operator canggih menjalankan banyak node di seluruh banyak cluster yang benar-benar berbeda, mengakumulasi pendapatan block reward sebanding dengan jumlah node mereka sambil berkontribusi secara proporsional pada kesehatan jaringan. Ini adalah hasil yang dapat diterima: pengaruh konsensus terkonsentrasi dibatasi; partisipasi modal terdistribusi diberi reward.
 
-Operator yang memiliki pertanyaan tentang penetapan kluster, perencanaan migrasi, atau lini masa HF22/HF23 didorong untuk mengirim pesan di saluran Telegram Operator Node atau membuka issue di repositori ini.
+Operator dengan pertanyaan tentang penetapan cluster, perencanaan migrasi, atau timeline HF22/HF23 didorong untuk memposting di kanal Telegram Node Operators atau membuka issue di repositori ini.
 
 ---
 
 ## Bahasa yang Tersedia
 
-Terjemahan komunitas untuk dokumen ini dikelola di repositori whitepaper. Jika terjadi konflik antara versi terjemahan dan versi bahasa Inggris, versi bahasa Inggris yang berlaku.
+Terjemahan komunitas atas dokumen ini dipelihara dalam repositori whitepaper. Jika terjadi konflik apa pun antara terjemahan dan versi bahasa Inggris, versi bahasa Inggris yang berlaku.
 
-| Bahasa | Dokumen |
+| Language | Document |
 |---|---|
 | Español | [translations/es/concentration-limits-proposal.md](./translations/es/concentration-limits-proposal.md) |
 | Français | [translations/fr/concentration-limits-proposal.md](./translations/fr/concentration-limits-proposal.md) |
@@ -196,7 +198,8 @@ Terjemahan komunitas untuk dokumen ini dikelola di repositori whitepaper. Jika t
 | Português | [translations/pt/concentration-limits-proposal.md](./translations/pt/concentration-limits-proposal.md) |
 | Türkçe | [translations/tr/concentration-limits-proposal.md](./translations/tr/concentration-limits-proposal.md) |
 | Polski | [translations/pl/concentration-limits-proposal.md](./translations/pl/concentration-limits-proposal.md) |
+| Bahasa Indonesia | [translations/id/concentration-limits-proposal.md](./translations/id/concentration-limits-proposal.md) |
 
 ---
 
-*Dokumen ini bukan merupakan nasihat keuangan atau hukum. XEQM adalah koin utilitas untuk platform EXIOM, bukan produk investasi. Klasifikasi token, status sekuritas, dan peraturan yang berlaku bervariasi menurut yurisdiksi. Peserta harus berkonsultasi dengan kerangka hukum dan kualifikasi lokal mereka sebelum memperoleh atau beroperasi dengan XEQM. XEQM Labs tidak mendorong pembelian XEQM berdasarkan apresiasi harga spekulatif.*
+*Dokumen ini bukan merupakan nasihat keuangan atau hukum. XEQM adalah koin utilitas untuk platform EXIOM, bukan produk investasi. Klasifikasi token, status sekuritas, dan regulasi yang berlaku bervariasi menurut yurisdiksi. Peserta harus berkonsultasi dengan kerangka hukum dan regulasi lokal mereka sebelum memperoleh atau beroperasi dengan XEQM. XEQM Labs tidak mendorong pembelian XEQM atas dasar apresiasi harga spekulatif.*
