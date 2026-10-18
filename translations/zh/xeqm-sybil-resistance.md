@@ -1,17 +1,79 @@
-> ⚠️ **Out of date.** This translation predates the October 2026 English revision (Lokinet-before-HF23 sequencing, SQLite light-node release, HF22/rev1 activation, and the proximity-cluster-not-country framing). The English version governs until this is re-synced.
+# 女巫风险与 EXIOM 的缓解模型
+## EXIOM 代币经济学白皮书技术配套文件
+### 07/26/2026
 
-# Riesgo Sybil y el Modelo de Mitigación de EXIOM
-## Documento Técnico Complementario
-### 26/07/2026
+> **说明（2026 年 10 月更新）。** 集中度按*邻近集群*（共享物理或路由基础设施）强制执行，**而非按国家**。此处的节点数字是 July 2026 的快照；当前总数见白皮书。Lokinet 在 HF23 之前以非强制版本发布，HF23 开启强制执行。
 
-> *Esta traducción fue producida con herramientas de traducción AI. En caso de conflicto, la versión en inglés prevalece: [xeqm-sybil-resistance](https://github.com/XEQMLabs/xeqm-sybil-resistance)*
-
-Este documento es un complemento del libro blanco de tokenomía de EXIOM y asume que ha sido leído. Cubre el modelo de amenaza: qué aspecto tiene un ataque Sybil en una cadena de privacidad, qué hace que la arquitectura de EXIOM sea específicamente resistente o vulnerable, y cómo funciona en la práctica la metodología de monitoreo continuo.
-
-Para la especificación técnica completa en inglés, visite: [github.com/XEQMLabs/xeqm-sybil-resistance](https://github.com/XEQMLabs/xeqm-sybil-resistance)
-
-El estado de implementación actual de todos los controles se mantiene en la [Propuesta de Límites de Concentración](../es/concentration-limits-proposal.md).
+本文件是 EXIOM 代币经济学白皮书和节点集中度限制提案的配套文件，并假定两者均已阅读。白皮书涵盖控制措施是什么。concentration-limits-proposal 涵盖每项控制如何运作的机制。本文件涵盖威胁模型：女巫攻击在隐私链上实际是什么样子，是什么使 EXIOM 的架构特别具有抵抗力或脆弱性，以及持续监控方法论如何在实践中识别集中度。
 
 ---
 
-*Este documento no constituye asesoramiento financiero ni legal. En caso de conflicto, la versión en inglés prevalece.*
+## 隐私链上的女巫威胁
+
+对服务节点网络的女巫攻击意味着单个行为者以不同的表面身份运营多个节点，以获得不成比例的影响力。在透明区块链上，钱包图分析通常可以揭示多个节点运营者地址由共同来源提供资金，从而暴露女巫。在隐私链上，该工具因设计而不可用。保护用户交易的隐私保证也移除了最常见的女巫检测方法。
+
+因此，EXIOM 的女巫攻击面与透明链以一种特定方式不同：正确使用隐私功能的运营者可以呈现多个在协议层面看似无关的钱包地址，无论他们控制多少资本。这不是隐私设计的缺陷。它是任何隐私链的固有属性，必须通过交易图分析以外的机制来解决。
+
+EXIOM 上的两个女巫攻击面是不同的，需要单独的控制：
+
+**共识影响力攻击。** 运营者通过任何钱包结构积累足够的节点，以同时持有不成比例数量的法定人数席位。这使他们能够影响 oracle 会话结果、Pulse 轮次和义务法定人数，超出其个人质押比例所显示的公平程度。损害的是共识完整性，不一定是网络正常运行时间。
+
+**故障域攻击。** 运营者将节点集中在单个物理设施中。这作为攻击可能是有意的也可能不是；它可能源于成本优化。损害的是网络生存能力：一次设施停机会同时使运营者的节点离线，如果集中度足够大，可能会使区块生产停滞。
+
+---
+
+## 是什么使 EXIOM 在结构上具有抵抗力
+
+**每个身份的资本成本。** 与身份免费的纯女巫攻击不同，每个 EXIOM 服务节点需要质押 200,000 XEQM，运营者本人至少质押 100,000 XEQM。运行 100 个节点的运营者有 10,000,000 XEQM 的资本被质押和锁定。通过钱包拆分创建额外的表面身份并不会降低这一成本 -- 每个节点仍需要 100,000 XEQM 的运营者质押。女巫攻击在每种规模下都代价高昂。
+
+**解绑摩擦。** 自愿退出和强制注销都有 14 天解绑期，意味着投入女巫节点的资本无法快速抽取。决定退出的攻击者无法比任何其他运营者更快地退出。
+
+**公开节点注册表。** 每个服务节点的注册密钥和运营者钱包地址都是公开的。节点无法匿名参与共识。虽然钱包地址背后的人类身份是私有的，但节点的运营指纹随时间通过注册模式、正常运行时间证明时序和路由行为累积。
+
+---
+
+## 如何在不进行交易图分析的情况下识别集中度
+
+由于交易级分析不可用，EXIOM 的集中度检测依赖于四个可从节点行为而非资金历史观察到的信号。
+
+**注册密钥聚类。** 注册在同一运营者钱包密钥下的节点明确是同一运营者。这从链上数据是确定性的。不进行钱包拆分的大型运营者仅通过这一信号即完全可见。网络上当前最大的部署，包括分别从单个 IP 地址运行 58 个和 51 个节点的节点，经注册密钥分析确认各为单个运营者。
+
+**IP 地址和子网聚类。** 当前主要的物理共置信号。来自同一 IP 地址的多个节点几乎肯定在同一台服务器上。来自同一子网的多个节点表明同一托管账户或数据中心块。这一信号今天无需任何守护进程变更即可用，并将在 Lokinet 激活后作为补充信号保留。
+
+**正常运行时间证明时序相关性。** 网络按固定计划从每个活跃节点接收正常运行时间证明。这些证明的到达时间戳分布由接收节点记录。在同一物理主机或虚拟机监控程序上运行的节点在一个特征性的紧密窗口内提交证明，通常低于 10 毫秒，因为它们共享同一系统时钟和网络接口。一簇来自不同钱包密钥、其证明持续在此窗口内到达的节点，是共享物理基础设施的强信号，无需任何守护进程变更，且在 Lokinet 未激活时即可检测到。
+
+这一信号对于识别将节点保留在共享基础设施上的钱包拆分运营者特别有用。钱包密钥不同；证明时序则不同。
+
+**Lokinet 路由邻近性（在 HF23 之前以非强制方式发布；在 HF23 强制执行）。** 一旦 Lokinet 作为网络传输层激活，路由图提供节点网络的连续物理拓扑图。位于同一设施的节点通过同一上游基础设施路由，无论其钱包密钥或宣告的 IP 地址如何，都产生相关的路径选择和亚毫秒级的节点间延迟。这是最稳健的信号，因为它反映了物理网络现实，而物理网络现实在不实际移动基础设施的情况下无法通过软件配置改变。
+
+---
+
+## 钱包拆分攻击详解
+
+EXIOM 上可用的最老练的女巫方法是钱包拆分：将节点注册在多个通过隐私链交易层获得资金的钱包地址下，使共同资金来源不可见。这击败了注册密钥聚类信号，但击败不了其他信号。
+
+一个将 426 个节点分布于 10 个钱包、全部托管在同一 Contabo 设施的运营者会被以下方式暴露：
+
+- 正常运行时间证明时序：全部 426 个节点的证明在共享基础设施特征性的亚 10ms 窗口内到达
+- IP 和子网分析：即使有多个 IP，数据中心块分配和 ASN 也是共享的
+- Lokinet 邻近性（HF23 后）：全部 426 个节点无论钱包密钥如何都通过同一 Contabo 骨干路由
+
+一个将 426 个节点分布于 10 个钱包、真正分布在 10 个不同国家的 10 个不同提供商的运营者，不会被任何当前信号实质性地暴露。注册密钥不同，证明时序因基础设施不同而不同，ASN 不同，Lokinet 路径也不同。在协议层面，这看起来像 10 个不同的运营者。
+
+这是应用所有控制后 EXIOM 上的残余女巫风险。它的后果是有界的：HF23 法定人数去重将每个邻近集群限制为每轮一个法定人数席位，无论钱包结构如何，因此即使是分布式的钱包拆分运营者也不会获得无界的共识影响力。他们的区块奖励收入随其节点数量缩放，这是公平的，因为他们已质押成比例的资本。他们每轮的共识影响力无论使用多少个钱包都受集群去重限制。
+
+---
+
+## 持续监控方法论
+
+**治理黑名单。** 一个由治理管理的公钥黑名单阻止被列入黑名单的注册密钥注册新节点。在原密钥被列入黑名单时迁移到新钱包密钥的运营者创建了有据可查的规避记录，且新密钥的证明时序和路由行为会与被列入黑名单密钥的历史画像进行相关性比对。
+
+**贡献者槽位图分析。** 服务节点贡献者槽位是一个次要的身份信号。跨其多个自有钱包密钥为贡献者槽位提供资金的运营者即使在隐私链上也创建了一个可观察的关系图，因为贡献者注册交易携带关于它们贡献给哪些节点的可观察数据。一个持续从钱包 B 和 C 向注册在钱包 A 下的节点贡献，而那些相同的钱包 B 和 C 又注册它们自己的节点的运营者，创建了一个补充直接注册密钥聚类信号的相关性图。
+
+**ASN 监控。** 每个活跃节点的 IP 通过公开 BGP 数据映射到一个自治系统编号。网络跟踪活跃节点集合中的 ASN 集中度。共享 ASN 的节点共享提供商级基础设施和法律风险敞口。即使单个节点注册看似无关，高 ASN 集中度也会被标记以供治理审查。ASN 信号不识别人类运营者，但它识别故障域。
+
+本文件所述所有控制的当前实施状态维护在 [节点集中度限制提案](https://github.com/XEQMLabs/whitepaper/blob/main/concentration-limits-proposal.md) 中。
+
+---
+
+*本文件不构成财务或法律建议。XEQM 是 EXIOM 平台的实用代币，而非投资产品。代币分类、证券状态和适用法规因司法管辖区而异。参与者在获取或使用 XEQM 之前应咨询其当地的法律和监管框架。XEQM Labs 不鼓励基于投机性价格升值购买 XEQM。*
