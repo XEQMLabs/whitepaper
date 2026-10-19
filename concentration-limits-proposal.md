@@ -2,7 +2,7 @@
 ## Technical Companion to the EXIOM Tokenomics Whitepaper
 ### 07/26/2026
 
-> **Scope note (updated October 2026).** The enforced unit is the *proximity cluster* (a group of nodes that share physical or routing infrastructure, detected via Lokinet routing proximity, uptime-proof timing, and ASN), **not the country**. A country with several independent facilities is unaffected. The country figures below are a coarse geographic proxy for where the concentration currently sits, not the thing the protocol caps. Node counts in this companion are a July 2026 snapshot (~672 nodes); see the whitepaper for current network totals (943 nodes as of September 27, 2026). Lokinet ships in a non-enforcing release before HF23, and HF23 flips enforcement.
+> **Scope note (updated 19 October 2026).** The enforced unit is the *proximity cluster* (a group of nodes that share physical or routing infrastructure, detected via Lokinet routing proximity, uptime-proof timing, and ASN), **not the country** and not a provider's registration country. A country or provider with several genuinely independent facilities is less of a risk than a single facility holding a large share. The concentration data below is a 19 October 2026 snapshot (893 active nodes) grouped by hosting provider, the best proxy available before Lokinet. Lokinet ships in a non-enforcing release before HF23, and HF23 flips enforcement.
 
 This document is a companion to the EXIOM Tokenomics Whitepaper and assumes it has been read. The whitepaper covers what the concentration controls are and why they exist. This document covers the mechanical detail of how each control works, the testnet validation data behind HF22, the precise economic math behind the zero-reward modifier, the operator identity question on a privacy chain, and the residual risks the protocol does not fully solve.
 
@@ -10,21 +10,22 @@ This document is a companion to the EXIOM Tokenomics Whitepaper and assumes it h
 
 ## The Current Concentration Data
 
-| Country | Active nodes |
-|---|---|
-| France | 492 |
-| Germany | 70 |
-| United States | 55 |
-| Canada | 18 |
-| Poland | 13 |
-| United Kingdom | 10 |
-| Türkiye | 5 |
-| Australia | 4 |
-| Singapore | 2 |
-| Lithuania | 2 |
-| Serbia | 1 |
+Measured 19 October 2026 at 893 active nodes, grouped by hosting provider (ASN), which is the concentration signal available today before Lokinet. Provider is a far better proxy for a shared failure domain than a country flag, because one company's network and facilities tend to fail, or be ordered offline, together.
 
-France holds 492 of the 672 nodes in this snapshot (about 73% of the network), and that concentration is almost entirely a single Contabo facility in Grand Est holding roughly 426 nodes (about 63% of the network). The country total is not what the protocol caps; the Grand Est **cluster** is. The survivability threshold is 30% of active nodes per proximity cluster (about 202 nodes at this snapshot's 672, and about 283 at the 943 nodes in the current whitepaper), recalculated continuously as the network grows. Grand Est at roughly 426 nodes is more than double that cap.
+| Provider (ASN) | Active nodes | Share |
+|---|---|---|
+| NodeHub (AS214083) | 444 | 49.7% |
+| Contabo (AS51167, plus AS40021 and Contabo Asia AS141995) | ~303 | ~34% |
+| OVH (AS16276) | 62 | 6.9% |
+| Oracle (AS31898) | 22 | 2.5% |
+| WebNX (AS18450) | 12 | 1.3% |
+| all other providers combined (12 more ASNs) | ~50 | ~5.6% |
+
+NodeHub alone holds 49.7% of the network, well over the 30% survivability cap (267 nodes at 893 active), and a single /24 subnet holds 41.2%. This one provider is the concentration HF23 is built to break.
+
+How it got here. Pecunia, a hosting service that offered to run XEQM nodes for operators, placed most of its nodes on Contabo. Pecunia's performance has been poor, and many operators have since migrated to NodeHub. So the dominant failure domain has shifted from Contabo, which still holds about a third of the network (much of it the Grand Est facility), to NodeHub, now the single largest cluster on the network.
+
+A note on country figures. A provider's registration country is not where its servers sit. NodeHub is US-registered and Contabo is German-registered, so a by-country view tags their nodes US and DE regardless of the physical data center (Contabo's largest XEQM facility is in Grand Est, France). The protocol caps neither country nor provider registration. It caps the proximity cluster, the set of nodes that actually share physical or routing infrastructure. ASN and subnet are today's proxy for that, and HF23 replaces them with Lokinet routing proximity, which can also separate distinct facilities inside one provider. The threshold is 30% of active nodes per cluster (267 at the current 893), recalculated continuously as the network grows.
 
 ---
 
@@ -42,7 +43,7 @@ This section answers the question directly: how does HF23 affect how you run you
 
 **The dynamic works in your favor if you deploy into sparse regions.** If a region eventually fills up, the node explorer shows it and operators have a financial incentive to move before the cap affects them. Operators who got there first keep full rewards on their oldest nodes up to the threshold. New registrations into an over-concentrated cluster earn nothing immediately, so the economics naturally push new deployments toward lighter regions.
 
-**The specific problem HF23 solves** is one facility in France (the Grand Est Contabo cluster) hosting roughly 426 nodes, about 63% of the network in this snapshot. If that facility goes offline the network stalls. The goal is getting that cluster below the 30% cap. Every other operator running a responsible multi-node setup in a non-concentrated cluster is exactly what the network needs more of.
+**The specific problem HF23 solves** is a single provider, NodeHub, now hosting about half the network (444 nodes, 49.7%), with Contabo second at roughly a third. If NodeHub's infrastructure goes offline or is ordered down, the network stalls. The goal is getting any one cluster below the 30% cap. Every operator running a responsible multi-node setup on a different, non-concentrated provider or facility is exactly what the network needs more of.
 
 ---
 
