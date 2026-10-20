@@ -16,7 +16,7 @@
 | GUI wallet | Live, github.com/XEQMLabs/XEQMLabs-GUI |
 | Node explorer | Live, active service node monitoring |
 | EXIOM Oracle | Live on mainnet (Robinhood Chain, chainId 4663); 12-member operator committee as of September 28, 2026 |
-| EXIOM developer API | Live in beta — self-serve keys, signed compliance claims and a verification engine, OpenAPI at /docs; free-to-build with prepaid per-call usage rolling out (September 27, 2026) |
+| EXIOM developer API | Live in beta — self-serve keys, signed compliance claims and a verification engine, OpenAPI at /docs; free-to-build with time-boxed paid plans rolling out (September 27, 2026) |
 | EXIOM Privacy Oracle (TLSNotary / ZK) | Foundations live (verification engine, oracle sessions); full private-web-data oracle in Phase 3 |
 | EXIOM RFQ trading platform | In development, Phase 2/3, XEQM/BTC first pair |
 | HF22, wallet-key quorum dedup, unbonding unification, Pulse stall-recovery | Activated at mainnet block 219120. The Pulse stall-recovery revision (snode_revision 1, signature-based fallback) activated at block 236920 on October 18, 2026 |
@@ -27,7 +27,7 @@
 
 ## 1. What XEQM Labs Is
 
-XEQM Labs is a privacy technology company. Its flagship product, EXIOM, is a privacy-preserving Proof-of-Stake Layer 1 network and commercial developer platform operated by a global set of service nodes. XEQM is the access and usage coin for the platform. Developers build for free and pay for production usage in XEQM, consumed as they call the API. Service node operators earn XEQM for securing the network, and the same operators can earn additional revenue by running an oracle sidecar that serves the platform's oracle products.
+XEQM Labs is a privacy technology company. Its flagship product, EXIOM, is a privacy-preserving Proof-of-Stake Layer 1 network and commercial developer platform operated by a global set of service nodes. XEQM is the access and usage coin for the platform. Developers build for free and pay for production usage in XEQM by buying a plan for a fixed window. Service node operators earn XEQM for securing the network, and the same operators can earn additional revenue by running an oracle sidecar that serves the platform's oracle products.
 
 The project carries forward a community and operational history going back more than seven years. The EXIOM mainnet was built to give that community a network with a verifiable supply, a predictable emission schedule, pure Proof-of-Stake consensus with no Proof-of-Work component, and service node mechanics that respect operator time and capital.
 
@@ -41,7 +41,7 @@ XEQM is a native Layer 1 coin, not tokenized on any other chain, not an ERC-20 o
 
 **EXIOM Oracle.** Live on mainnet. The platform's first oracle product: a committee of XEQM service-node operators — each running a lightweight oracle sidecar — that produces BLS-aggregate, EIP-712 signed compliance attestations (for example, that an address is eligible for a given jurisdiction) which applications consume through the developer API. It is deployed on Robinhood Chain (chainId 4663) and runs a 12-member operator committee as of September 28, 2026. Running the sidecar is how a service-node operator earns additional, usage-based revenue on top of block rewards.
 
-**EXIOM Developer API.** Live in beta. A structured API exposing the platform's compliance and verification capabilities — signed compliance claims and a verification engine (signed-claims, TLSNotary, and zero-knowledge mechanisms) — with self-serve access (a DID plus API key), an OpenAPI 3.1 specification, webhooks, and idempotent requests. Developers build for free on a generous monthly allowance and pay for production usage in XEQM, consumed per call. Phase 2, active.
+**EXIOM Developer API.** Live in beta. A structured API exposing the platform's compliance and verification capabilities — signed compliance claims and a verification engine (signed-claims, TLSNotary, and zero-knowledge mechanisms) — with self-serve access (a DID plus API key), an OpenAPI 3.1 specification, webhooks, and idempotent requests. Developers build for free on a throttled allowance and pay for production usage in XEQM by buying a plan for a fixed window. Phase 2, active.
 
 **EXIOM Privacy Oracle.** Designed, foundations in place. The broader evolution of the oracle: proving facts about private web data (via TLSNotary and zero-knowledge techniques) without exposing the underlying source. The verification engine and oracle-session endpoints that underpin it are already live; the full private-web-data oracle is a Phase 3 deliverable. Both the EXIOM RFQ platform and third-party applications can consume oracle outputs.
 
@@ -88,7 +88,7 @@ The treasury receives approximately 17,857 XEQM per day, or roughly 124,999 XEQM
 
 ### EXIOM Platform Revenue and Distribution
 
-Beyond block rewards, the platform earns revenue from developer usage. Access is prepaid: a developer funds their account by depositing XEQM (non-refundable), and that balance is drawn down as they consume the production API, priced per call. Development and evaluation on the free allowance are not charged.
+Beyond block rewards, the platform earns revenue from developer usage. Access is sold as time-boxed plans. A developer buys a plan for a fixed window and pays once in XEQM, and that payment is non-refundable and recognized as platform revenue on purchase. The platform holds no developer balance. Development and evaluation on the free tier are not charged.
 
 Consumed XEQM is recognized as platform revenue and distributed between the operators who serve the oracle and platform operations:
 
@@ -207,15 +207,15 @@ Lokinet ships in a non-enforcing release ahead of HF23, targeted for Q4 2026, wi
 
 XEQM demand comes from three sources. Node staking locks the largest share of supply, approximately 68% at the current 943 active nodes (September 27, 2026). Developer consumption creates a continuous velocity layer: applications pay for production API usage in XEQM, so platform adoption converts directly into recurring demand for the coin. Oracle access adds a third layer for higher-volume consumers.
 
-Access follows a prepaid, usage-based model rather than a stake-to-unlock gate — developers do not have to acquire and lock a fixed stake to build:
+Access is sold as time-boxed plans, not a stake-to-unlock gate, so developers never have to acquire and lock a fixed stake to build:
 
 | Tier | Access model |
 |---|---|
-| Free | Build and evaluate at no cost: a generous monthly call allowance, no deposit required |
-| Production | Prepaid usage: deposit XEQM and pay per call; webhooks and higher limits |
+| Free | Build and evaluate at no cost on a throttled allowance, no payment required |
+| Production | Buy a plan for a fixed window and pay once in XEQM for its call allowance; webhooks and higher limits |
 | Enterprise | Custom limits, SLA, and support; volume terms |
 
-Production usage is metered per API call and drawn from the developer's prepaid XEQM balance. Deposits are non-refundable and are recognized as platform revenue as they are consumed (see Section 3). An earlier design gated tiers behind a fixed XEQM stake; that has been replaced by this prepaid model, which is simpler for developers and standard for commercial APIs.
+A developer buys a plan for a fixed window and pays once in XEQM. The payment is non-refundable and is recognized as platform revenue on purchase (see Section 3), and the platform holds no developer balance. Plan allowances are use-it-or-lose-it within the window. When a window ends or its allowance is exhausted, the developer is throttled to the free tier rather than cut off, so a live application keeps running while the developer renews, and service is suspended only after a grace period with no renewal. An earlier design gated tiers behind a fixed XEQM stake; that has been replaced by this plan model, which is simpler for developers, keeps the platform out of custody of developer funds, and is standard for commercial APIs.
 
 ---
 
@@ -275,7 +275,7 @@ Phase 3 introduces a formal proposal and comment process. Phase 6 introduces wei
 
 **Phase 1, Network stabilization. COMPLETE.** The service node network grew to 943 active service nodes as of September 27, 2026 (from 693 across 184 operators in July 2026, Nakamoto coefficient 7). XEQ to XEQM coin swap ran and closed successfully.
 
-**Phase 2, EXIOM developer API and EXIOM Oracle. ACTIVE.** The EXIOM Oracle is live on mainnet with an operator committee, and the developer API is live in beta (self-serve credentials, compliance and verification endpoints, OpenAPI). Remaining Phase 2 work: prepaid consumption billing, the operator revenue share, and first production integrations. EXIOM RFQ trading platform development proceeds in parallel, XEQM/BTC as the first trading pair.
+**Phase 2, EXIOM developer API and EXIOM Oracle. ACTIVE.** The EXIOM Oracle is live on mainnet with an operator committee, and the developer API is live in beta (self-serve credentials, compliance and verification endpoints, OpenAPI). Remaining Phase 2 work: plan billing, the operator revenue share, and first production integrations. EXIOM RFQ trading platform development proceeds in parallel, XEQM/BTC as the first trading pair.
 
 **Phase 3, EXIOM Privacy Oracle and RFQ platform.** The oracle rolls out in phases: internal proof of concept, federated testnet, then mainnet with internal consumers. The RFQ trading platform reaches production in this phase, using the oracle for private price attestation on the XEQM/BTC pair. Both are built on the EXIOM API.
 
